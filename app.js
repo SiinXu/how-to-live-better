@@ -30,15 +30,10 @@ const docCache = {};
 $('#theme').onclick = () => {
   const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = t;
-  $('meta[name=theme-color]').content = t === 'dark' ? '#1b1b1f' : '#ffffff';
+  $('meta[name=theme-color]').content = t === 'dark' ? '#141413' : '#f6f5f2';
   try { localStorage.setItem('htlb-theme', t); } catch (e) {}
 };
 addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 8), { passive: true });
-document.addEventListener('pointermove', e => {
-  const c = e.target.closest && e.target.closest('.sp'); if (!c) return;
-  const r = c.getBoundingClientRect();
-  c.style.setProperty('--mx', (e.clientX - r.left) + 'px'); c.style.setProperty('--my', (e.clientY - r.top) + 'px');
-}, { passive: true });
 $('#sbtn').onclick = () => { location.hash = '#/search'; setTimeout(() => $('#q')?.focus(), 60); };
 addEventListener('keydown', e => {
   if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); $('#sbtn').click(); }
@@ -122,6 +117,29 @@ function hl(html, terms) {
   const re = new RegExp('(' + terms.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|') + ')', 'gi');
   return html.split(/(<[^>]+>)/).map(s => s.startsWith('<') ? s : s.replace(re, '<mark>$1</mark>')).join('');
 }
+
+function formatSrc(html) {
+  if (!html) return '—';
+  // Shorten visible URL text; keep full href + title for hover/copy
+  let s = String(html).replace(/<a\s+([^>]*href="([^"]+)"[^>]*)>(https?:\/\/[^<]+)<\/a>/gi, (_, attrs, href, text) => {
+    let label = text;
+    try {
+      const u = new URL(href);
+      const host = u.hostname.replace(/^www\./, '');
+      const path = u.pathname + (u.search || '');
+      let shortPath = path === '/' ? '' : path;
+      if (shortPath.length > 28) shortPath = shortPath.slice(0, 14) + '…' + shortPath.slice(-10);
+      label = host + shortPath;
+    } catch (e) {
+      label = text.length > 56 ? text.slice(0, 54) + '…' : text;
+    }
+    return `<a ${attrs} class="src-a" title="${esc(text)}">${esc(label)}</a>`;
+  });
+  const parts = s.split(/\s*;\s+/).map(x => x.trim()).filter(Boolean);
+  if (parts.length <= 1) return `<div class="src-item">${s}</div>`;
+  return `<ul class="src-list">${parts.map(x => `<li class="src-item">${x}</li>`).join('')}</ul>`;
+}
+
 function entryHTML(e, o = {}) {
   const t = o.terms;
   const rc = { '极高': 'r3', '高': 'r2', '一般': 'plain' }[e.r] || 'plain';
@@ -143,7 +161,7 @@ function entryHTML(e, o = {}) {
       <div class="k">收益</div><div class="v">${hl(e.gain, t)}</div>
       ${noteRow}
     </div>
-    <details class="src"${o.open ? ' open' : ''}><summary>来源<span class="cnt"> · 证据 ${esc(e.gfull || e.g)}</span></summary><div class="body">${e.src || '—'}</div></details>
+    <details class="src"${o.open ? ' open' : ''}><summary>来源<span class="cnt"> · 证据 ${esc(e.gfull || e.g)}</span></summary><div class="body">${formatSrc(e.src)}</div></details>
   </article>`;
 }
 
