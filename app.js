@@ -30,7 +30,7 @@ const docCache = {};
 $('#theme').onclick = () => {
   const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = t;
-  $('meta[name=theme-color]').content = t === 'dark' ? '#141413' : '#f6f5f2';
+  $('meta[name=theme-color]').content = t === 'dark' ? '#09090b' : '#f4f4f5';
   try { localStorage.setItem('htlb-theme', t); } catch (e) {}
 };
 addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 8), { passive: true });
@@ -155,7 +155,7 @@ function entryHTML(e, o = {}) {
       ${costPills}
       ${e.dp ? '<span class="bd dp">争议</span>' : ''}${e.todo ? '<span class="bd dp">含待核实</span>' : ''}
     </div>
-    ${e.human ? `<p class="human">${hl(e.human, t)}</p>` : ''}
+    ${e.human ? `<div class="human"><span class="lb">说人话</span>${hl(e.human, t)}</div>` : ''}
     <div class="rows">
       <div class="k">成本</div><div class="v">${hl(e.cost, t)}</div>
       <div class="k">收益</div><div class="v">${hl(e.gain, t)}</div>
@@ -168,15 +168,15 @@ function entryHTML(e, o = {}) {
 /* ---------- home ---------- */
 function home() {
   const m = D.meta, s = m.stats;
-  const res = m.res4.map(r => {
+  const res = m.res4.map((r, i) => {
     const ln = RES_LENS[r.k];
-    return `<a class="sp res" href="#/search?ln=${encodeURIComponent(ln)}"><span class="ico">${ICON[ln]}</span><h3>${esc(r.k)}</h3><p>${esc(r.v)}</p><div class="ft"><span><b>${m.lensN[ln]}</b> 条 · ${LENS[ln]}</span><span class="go">${ARROW}</span></div></a>`;
+    return `<a class="sp res${i === 0 ? ' feat' : ''}" href="#/search?ln=${encodeURIComponent(ln)}"><span class="ico">${ICON[ln]}</span><h3>${esc(r.k)}</h3><p>${esc(r.v)}</p><div class="ft"><span><b>${m.lensN[ln]}</b> 条 · ${LENS[ln]}</span><span class="go">${ARROW}</span></div></a>`;
   }).join('');
   const chs = D.ch.map(c => `<a class="sp cc" href="#/c/${c.n}"><div class="top2"><span class="num">${pad(c.n)}</span><span class="cnt">${c.e.length} 条</span></div><h3>${esc(c.t)}</h3><p>${esc(D.q[c.n] || '')}</p><div class="bars">${evBar(c)}<div class="lg"><span>A <b>${c.cnt.A}</b> · B <b>${c.cnt.B}</b> · C <b>${c.cnt.C}</b></span><span>极高 <b>${c.cnt['极高']}</b></span></div></div></a>`).join('');
   const longs = D.docs.filter(d => d.kind === 'doc').map(docCard).join('');
   render(`
   <section class="wrap hero">
-    <p class="eyebrow"><span class="dot"></span>开源 · ${s.entries} 条建议 · 证据分级 · CC BY 4.0</p>
+    <p class="eyebrow"><span class="dot"></span>Open source · ${s.entries} entries · Evidence-graded · CC BY 4.0</p>
     <h1>用最少的钱、时间和精力，换回最多的<em>寿命、金钱和人身自由</em></h1>
     <p class="lede">${esc(m.lede[0])}<br><b>${esc(m.lede[1])}</b></p>
     <form class="hsearch" id="hs" role="search">${SEARCH}<input id="hq" type="search" placeholder="搜条目，比如「低钠盐」「担保」「被裁」" autocomplete="off"><button type="submit">检索</button></form>
@@ -195,7 +195,7 @@ function home() {
     </dl>
   </section>
   <section class="wrap"><div class="notes">${m.notes.map((n, i) => `<div class="glass"><span class="k">${['怎么用', '注意', '声明'][i] || ''}</span>${n}</div>`).join('')}</div></section>
-  <section class="wrap sec"><div class="sec-h"><h2><span class="no">01</span>四种资源<small>想帮你多留住的</small></h2><p class="meta">不同口径之间不做比较</p></div><div class="grid g4">${res}</div></section>
+  <section class="wrap sec"><div class="sec-h"><h2><span class="no">01</span>四种资源<small>想帮你多留住的</small></h2><p class="meta">不同口径之间不做比较</p></div><div class="bento">${res}</div></section>
   <section class="wrap sec"><div class="sec-h"><h2><span class="no">02</span>目录<small>${D.ch.length} 节，每节按性价比排</small></h2><p class="meta">条形图：证据 A / B / C 占比</p></div><div class="grid">${chs}</div></section>
   <section class="wrap sec"><div class="sec-h"><h2><span class="no">03</span>长文<small>和按时间排的场景清单</small></h2><a class="more" href="#/docs">全部长文 →</a></div><div class="grid">${longs}</div></section>
   <section class="wrap sec"><div class="sec-h"><h2><span class="no">04</span>怎么读<small>先看这几条</small></h2><a class="more" href="#/about">完整说明 →</a></div>
