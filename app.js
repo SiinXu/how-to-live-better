@@ -30,8 +30,8 @@ const docCache = {};
 $('#theme').onclick = () => {
   const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = t;
-  $('meta[name=theme-color]').content = t === 'dark' ? '#09090b' : '#f4f4f5';
-  try { localStorage.setItem('htlb-theme', t); } catch (e) {}
+  $('meta[name=theme-color]').content = t === 'dark' ? '#0c0c0e' : '#fbfbfa';
+  try { localStorage.setItem('htlb-theme-v6', t); } catch (e) {}
 };
 addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 8), { passive: true });
 $('#sbtn').onclick = () => { location.hash = '#/search'; setTimeout(() => $('#q')?.focus(), 60); };
@@ -168,49 +168,57 @@ function entryHTML(e, o = {}) {
 /* ---------- home ---------- */
 function home() {
   const m = D.meta, s = m.stats;
-  const res = m.res4.map((r, i) => {
+  const res = m.res4.map(r => {
     const ln = RES_LENS[r.k];
-    return `<a class="sp res${i === 0 ? ' feat' : ''}" href="#/search?ln=${encodeURIComponent(ln)}"><span class="ico">${ICON[ln]}</span><h3>${esc(r.k)}</h3><p>${esc(r.v)}</p><div class="ft"><span><b>${m.lensN[ln]}</b> 条 · ${LENS[ln]}</span><span class="go">${ARROW}</span></div></a>`;
+    return `<a class="res" href="#/search?ln=${encodeURIComponent(ln)}"><span class="rk">${ICON[ln]}${esc(r.k)}<span class="rn">${m.lensN[ln]}</span></span><span class="rv">${esc(r.v)}</span></a>`;
   }).join('');
-  const chs = D.ch.map(c => `<a class="sp cc" href="#/c/${c.n}"><div class="top2"><span class="num">${pad(c.n)}</span><span class="cnt">${c.e.length} 条</span></div><h3>${esc(c.t)}</h3><p>${esc(D.q[c.n] || '')}</p><div class="bars">${evBar(c)}<div class="lg"><span>A <b>${c.cnt.A}</b> · B <b>${c.cnt.B}</b> · C <b>${c.cnt.C}</b></span><span>极高 <b>${c.cnt['极高']}</b></span></div></div></a>`).join('');
-  const longs = D.docs.filter(d => d.kind === 'doc').map(docCard).join('');
+  const chs = D.ch.map(c => `<a class="crow" href="#/c/${c.n}"><span class="cn">${pad(c.n)}</span><span class="ct"><b>${esc(c.t)}</b><small>${esc(D.q[c.n] || '')}</small></span><span class="cm">${evBar(c)}<span class="cc">${c.e.length}</span></span></a>`).join('');
+  const longs = D.docs.filter(d => d.kind === 'doc').map(docRow).join('');
+  const notes = m.notes.map((n, i) => `<p><span class="nk">${['怎么用', '注意', '声明'][i] || ''}</span>${n}</p>`).join('');
   render(`
   <section class="wrap hero">
-    <p class="eyebrow"><span class="dot"></span>Open source · ${s.entries} entries · Evidence-graded · CC BY 4.0</p>
-    <h1>用最少的钱、时间和精力，换回最多的<em>寿命、金钱和人身自由</em></h1>
-    <p class="lede">${esc(m.lede[0])}<br><b>${esc(m.lede[1])}</b></p>
-    <form class="hsearch" id="hs" role="search">${SEARCH}<input id="hq" type="search" placeholder="搜条目，比如「低钠盐」「担保」「被裁」" autocomplete="off"><button type="submit">检索</button></form>
-    <div class="quick">
-      <a class="chip" href="#/search?r=极高">性价比极高 <span class="n">${s['极高']}</span></a>
-      <a class="chip" href="#/search?g=A">只看证据 A <span class="n">${s.A}</span></a>
-      <a class="chip" href="#/search?r=极高&g=A">极高 × A</a>
-      <a class="chip" href="#/c/13">紧急情况：先做什么</a>
-      <a class="chip" href="#/docs">长文与场景清单</a>
+    <div class="hl">
+      <p class="eyebrow">高性价比人生指南 · eternity4719 · CC BY 4.0</p>
+      <h1>用最少的钱、时间和精力，换回最多的<span class="ac">寿命、金钱和人身自由</span>。</h1>
+      <p class="lede">${esc(m.lede[0])}</p>
+      <form class="hsearch" id="hs" role="search">${SEARCH}<input id="hq" type="search" placeholder="搜 ${s.entries} 条建议，比如「低钠盐」「担保」「被裁」" autocomplete="off"><kbd>↵</kbd></form>
+      <div class="quick">
+        <a class="chip" href="#/search?r=极高">性价比极高 <span class="n">${s['极高']}</span></a>
+        <a class="chip" href="#/search?g=A">证据 A <span class="n">${s.A}</span></a>
+        <a class="chip" href="#/search?r=极高&g=A">极高 × A</a>
+        <a class="chip" href="#/c/13">紧急情况</a>
+        <a class="chip" href="#/docs">场景清单</a>
+      </div>
     </div>
-    <dl class="hstats">
-      <div><dt>${s.entries}</dt><dd>条建议，分 ${D.ch.length} 节</dd></div>
-      <div><dt>${s.A}</dt><dd>条证据 A（有具体数字、出处可核）</dd></div>
-      <div><dt>${s['极高']}</dt><dd>条性价比「极高」</dd></div>
-      <div><dt>${m.links.toLocaleString()}</dt><dd>条原始文献链接，见核实记录</dd></div>
-    </dl>
+    <aside class="hr">
+      <dl class="facts">
+        <div><dt>建议</dt><dd>${s.entries}<small>/ ${D.ch.length} 节</small></dd></div>
+        <div><dt>证据 A</dt><dd>${s.A}<small>有数字、可核</small></dd></div>
+        <div><dt>性价比极高</dt><dd>${s['极高']}<small>作者判断</small></dd></div>
+        <div><dt>原始文献</dt><dd>${m.links.toLocaleString()}<small>见核实记录</small></dd></div>
+      </dl>
+      <p class="lede2">${esc(m.lede[1])}</p>
+    </aside>
   </section>
-  <section class="wrap"><div class="notes">${m.notes.map((n, i) => `<div class="glass"><span class="k">${['怎么用', '注意', '声明'][i] || ''}</span>${n}</div>`).join('')}</div></section>
-  <section class="wrap sec"><div class="sec-h"><h2><span class="no">01</span>四种资源<small>想帮你多留住的</small></h2><p class="meta">不同口径之间不做比较</p></div><div class="bento">${res}</div></section>
-  <section class="wrap sec"><div class="sec-h"><h2><span class="no">02</span>目录<small>${D.ch.length} 节，每节按性价比排</small></h2><p class="meta">条形图：证据 A / B / C 占比</p></div><div class="grid">${chs}</div></section>
-  <section class="wrap sec"><div class="sec-h"><h2><span class="no">03</span>长文<small>和按时间排的场景清单</small></h2><a class="more" href="#/docs">全部长文 →</a></div><div class="grid">${longs}</div></section>
-  <section class="wrap sec"><div class="sec-h"><h2><span class="no">04</span>怎么读<small>先看这几条</small></h2><a class="more" href="#/about">完整说明 →</a></div>
-    <div class="grid">
-      <a class="sp dc" href="#/about"><span class="k">证据分级</span><h3>A / B / C 各代表什么</h3><p>A 有具体数字、出处可核；B 有研究支持但说不出确切数字；C 是作者经验或公认做法。</p><div class="ft"><span>A ${s.A} · B ${s.B} · C ${s.C}</span>${ARROW}</div></a>
-      <a class="sp dc" href="#/about"><span class="k">性价比档</span><h3>极高 / 高 / 一般怎么算</h3><p>由收益量级和三项成本（花钱、花时间、要毅力）合出来，是作者自己的判断，不是证据。</p><div class="ft"><span>极高 ${s['极高']} · 高 ${s['高']} · 一般 ${s['一般']}</span>${ARROW}</div></a>
-      <a class="sp dc" href="#/gloss"><span class="k">术语表</span><h3>看不懂那串数字</h3><p>总死亡率、HR、RR、95% CI、荟萃分析……${D.gloss.length} 条术语的大白话解释。</p><div class="ft"><span>${D.gloss.length} 条</span>${ARROW}</div></a>
-    </div>
+  <section class="wrap notes">${notes}</section>
+  <section class="wrap sec"><header class="sh"><h2>四种资源</h2><span>想帮你多留住的 · 不跨口径比较</span></header><div class="res4">${res}</div></section>
+  <section class="wrap sec"><header class="sh"><h2>目录</h2><span>${D.ch.length} 节 · 每节按性价比排 · 色条为证据 <i class="lg a"></i>A <i class="lg b"></i>B <i class="lg c"></i>C</span></header><div class="clist">${chs}</div></section>
+  <section class="wrap sec two">
+    <div><header class="sh"><h2>长文与场景清单</h2><a href="#/docs">全部 →</a></header><div class="dlist">${longs}</div></div>
+    <div><header class="sh"><h2>怎么读</h2><a href="#/about">完整说明 →</a></header><div class="dlist">
+      <a class="drow" href="#/about"><b>证据分级 A / B / C</b><small>A 有具体数字、出处可核；B 有研究支持但说不出确切数字；C 是作者经验或公认做法。</small><span class="dm">A ${s.A} · B ${s.B} · C ${s.C}</span></a>
+      <a class="drow" href="#/about"><b>性价比 极高 / 高 / 一般</b><small>由收益量级和三项成本合出来，是作者自己的判断，不是证据。</small><span class="dm">${s['极高']} · ${s['高']} · ${s['一般']}</span></a>
+      <a class="drow" href="#/gloss"><b>术语表</b><small>总死亡率、HR、RR、95% CI、荟萃分析的大白话解释。</small><span class="dm">${D.gloss.length} 条</span></a>
+      <a class="drow" href="#/rec"><b>核实记录</b><small>每条来源打开了哪个链接、原文怎么写、哪些没采用。</small><span class="dm">${D.docs.filter(d => d.kind === 'rec').length} 份</span></a>
+    </div></div>
   </section>`, 'home');
   $('#hs').onsubmit = e => { e.preventDefault(); location.hash = '#/search?q=' + encodeURIComponent($('#hq').value.trim()); };
 }
-function docCard(d) {
+function docRow(d) {
   const mins = Math.max(1, Math.round(d.chars / 500));
-  return `<a class="sp dc" href="#/${d.kind === 'rec' ? 'rec' : 'doc'}/${d.id}"><span class="k">${d.kind === 'rec' ? '核实记录' : '长文'}</span><h3>${esc(d.title)}</h3><p>${esc(d.lead)}</p><div class="ft"><span>约 ${mins} 分钟 · ${(d.chars / 1000).toFixed(1)}k 字</span>${ARROW}</div></a>`;
+  return `<a class="drow" href="#/${d.kind === 'rec' ? 'rec' : 'doc'}/${d.id}"><b>${esc(d.title)}</b><small>${esc(d.lead)}</small><span class="dm">${mins} 分钟</span></a>`;
 }
+const docCard = docRow;
 
 /* ---------- chapter ---------- */
 let cf = { n: 0, g: new Set(), r: new Set(), ln: new Set(), q: '' };
@@ -231,7 +239,7 @@ function chapter(n, focus, same) {
       <div>
         <div class="mchap"><select id="chsel" aria-label="切换章节">${D.ch.map(x => `<option value="${x.n}"${x.n === n ? ' selected' : ''}>${pad(x.n)} · ${esc(x.t)}</option>`).join('')}</select></div>
         <header class="chead">
-          <p class="eyebrow"><span class="dot"></span>第 ${pad(n)} 节 · ${c.e.length} 条 · A ${c.cnt.A} · 极高 ${c.cnt['极高']}</p>
+          <p class="eyebrow">第 ${pad(n)} 节 · ${c.e.length} 条 · A ${c.cnt.A} · 极高 ${c.cnt['极高']}</p>
           <h1><span class="no">${n}.</span>${esc(c.t)}</h1>
           ${D.q[n] ? `<p class="q">${esc(D.q[n])}</p>` : ''}
         </header>
@@ -245,7 +253,7 @@ function chapter(n, focus, same) {
           <span class="cnt" id="ccnt"></span>
         </div>
         <div class="elist" id="elist"></div>
-        <nav class="pager">${prev ? `<a class="sp" href="#/c/${prev.n}"><small>← 第 ${prev.n} 节</small><b>${esc(prev.t)}</b></a>` : ''}${next ? `<a class="sp nx" href="#/c/${next.n}"><small>第 ${next.n} 节 →</small><b>${esc(next.t)}</b></a>` : ''}</nav>
+        <nav class="pager">${prev ? `<a class="pg" href="#/c/${prev.n}"><small>← 第 ${prev.n} 节</small><b>${esc(prev.t)}</b></a>` : ''}${next ? `<a class="pg nx" href="#/c/${next.n}"><small>第 ${next.n} 节 →</small><b>${esc(next.t)}</b></a>` : ''}</nav>
         <p class="meta" style="margin-top:20px">原文：<a href="${GH}/blob/main/book/${encodeURIComponent(c.file)}" target="_blank" rel="noopener" style="text-decoration:underline">book/${esc(c.file)}</a></p>
       </div></div>`, 'c', c.t);
     $('#chsel').onchange = e => location.hash = '#/c/' + e.target.value;
@@ -289,10 +297,10 @@ function search(q) {
   for (const [k] of SF) sState[k] = new Set((q.get(k) || '').split(',').filter(Boolean));
   sShown = 40;
   render(`<section class="wrap shead">
-    <p class="eyebrow"><span class="dot"></span>按关键词、章节、证据和成本筛选 · 条件可叠加</p>
+    <p class="eyebrow">按关键词、章节、证据和成本筛选 · 条件可叠加</p>
     <h1>检索 ${D.meta.stats.entries} 条<em>建议</em></h1>
     <form class="hsearch" id="sf" role="search">${SEARCH}<input id="q" type="search" placeholder="多个词用空格隔开，比如「孩子 发烧」" value="${esc(sState.q)}" autocomplete="off"></form>
-    <div class="fpanel glass">
+    <div class="fpanel">
       <div class="frow"><label>章节</label><div class="ops"><select id="sch"><option value="">全部 ${D.ch.length} 节</option>${D.ch.map(c => `<option value="${c.n}"${String(c.n) === sState.ch ? ' selected' : ''}>${pad(c.n)} · ${esc(c.t)}</option>`).join('')}</select></div></div>
       ${SF.map(([k, lab, ops]) => `<div class="frow"><label>${lab}</label><div class="ops">${ops.map(([v, t]) => `<button class="chip" data-k="${k}" data-v="${esc(v)}">${t}<span class="n" data-c></span></button>`).join('')}</div></div>`).join('')}
       <div class="frow"><label>其他</label><div class="ops"><button class="chip" id="sdp">只看标了争议的</button><button class="chip" id="sclr">清空条件</button></div></div>
@@ -343,12 +351,12 @@ function docs() {
   const longs = D.docs.filter(d => d.kind === 'doc');
   const extra = D.docs.filter(d => d.kind === 'extra');
   render(`<section class="wrap shead">
-    <p class="eyebrow"><span class="dot"></span>${longs.length} 篇长文 · 原仓库 docs/</p>
+    <p class="eyebrow">${longs.length} 篇长文 · 原仓库 docs/</p>
     <h1>长文与<em>场景清单</em></h1>
     <p class="lede" style="animation:none">正文条目之外，原书把几件大事单独写成长文，另有四份按时间排的场景清单。每条来源的核实过程见<a href="#/rec" style="text-decoration:underline">核实记录</a>。</p>
   </section>
-  <section class="wrap sec"><div class="grid">${longs.map(docCard).join('')}</div></section>
-  <section class="wrap sec"><div class="sec-h"><h2>更多<small>工具与衍生</small></h2></div><div class="grid">${extra.map(d => `<a class="sp dc" href="#/about/${d.id}"><span class="k">${d.id === 'skill' ? 'AI skill' : '读者作品'}</span><h3>${esc(d.title)}</h3><p>${esc(d.lead)}</p><div class="ft"><span>${esc(d.path)}</span>${ARROW}</div></a>`).join('')}<a class="sp dc" href="#/rec"><span class="k">核实记录</span><h3>每条来源是怎么核实的</h3><p>按节和按追加主题记下的原文摘录、打开方式和未采用的来源。</p><div class="ft"><span>${D.docs.filter(d => d.kind === 'rec').length} 份</span>${ARROW}</div></a></div></section>`, 'docs', '长文');
+  <section class="wrap sec"><div class="dlist">${longs.map(docRow).join('')}</div></section>
+  <section class="wrap sec"><header class="sh"><h2>更多</h2><span>工具与衍生</span></header><div class="dlist">${extra.map(d => `<a class="drow" href="#/about/${d.id}"><b>${esc(d.title)}</b><small>${esc(d.lead)}</small><span class="dm">${d.id === 'skill' ? 'AI skill' : '读者作品'}</span></a>`).join('')}<a class="drow" href="#/rec"><b>核实记录：每条来源是怎么核实的</b><small>按节和按追加主题记下的原文摘录、打开方式和未采用的来源。</small><span class="dm">${D.docs.filter(d => d.kind === 'rec').length} 份</span></a></div></section>`, 'docs', '长文');
 }
 function recs() {
   const rs = D.docs.filter(d => d.kind === 'rec');
@@ -358,12 +366,12 @@ function recs() {
   const rest = rs.filter(r => !used.has(r.id)); if (rest.length) html.push(['其他', rest]);
   const sorted = l => l.slice().sort((a, b) => a.stem.localeCompare(b.stem, 'zh-CN', { numeric: true }));
   render(`<section class="wrap shead">
-    <p class="eyebrow"><span class="dot"></span>${rs.length} 份 · 原仓库 docs/核实记录/</p>
+    <p class="eyebrow">${rs.length} 份 · 原仓库 docs/核实记录/</p>
     <h1>核实<em>记录</em></h1>
     <p class="lede" style="animation:none">原书每条来源的核实过程：打开了哪个链接、原文怎么写、哪些来源没能核实因而没有采用。</p>
     <form class="hsearch" id="rf">${SEARCH}<input id="rq" type="search" placeholder="按标题筛选，比如「保险」「第 13 节」" autocomplete="off"></form>
   </section>
-  <section class="wrap" id="rwrap">${html.map(([n, l]) => `<div class="rgroup"><h3>${n} · ${l.length}</h3><div class="rlist">${sorted(l).map(r => `<a class="sp rl" href="#/rec/${r.id}" data-t="${esc(r.title + ' ' + r.stem)}"><b>${esc(r.title)}</b><small>${(r.chars / 1000).toFixed(1)}k</small></a>`).join('')}</div></div>`).join('')}</section>`, 'rec', '核实记录');
+  <section class="wrap" id="rwrap">${html.map(([n, l]) => `<div class="rgroup"><h3>${n} · ${l.length}</h3><div class="rlist">${sorted(l).map(r => `<a class="rl" href="#/rec/${r.id}" data-t="${esc(r.title + ' ' + r.stem)}"><b>${esc(r.title)}</b><small>${(r.chars / 1000).toFixed(1)}k</small></a>`).join('')}</div></div>`).join('')}</section>`, 'rec', '核实记录');
   $('#rf').onsubmit = e => e.preventDefault();
   $('#rq').oninput = e => {
     const t = e.target.value.trim().toLowerCase().replace(/\s+/g, '');
@@ -401,12 +409,12 @@ function buildToc() {
 /* ---------- glossary ---------- */
 function gloss() {
   render(`<section class="wrap shead">
-    <p class="eyebrow"><span class="dot"></span>${D.gloss.length} 条 · 原书 README「读懂数字」</p>
+    <p class="eyebrow">${D.gloss.length} 条 · 原书 README「读懂数字」</p>
     <h1>读懂<em>数字</em></h1>
     <div class="prose" style="margin-top:18px">${D.rd['术语表导语']}</div>
     <form class="hsearch" id="gf">${SEARCH}<input id="gq" type="search" placeholder="查术语，比如 HR、荟萃、LPR" autocomplete="off"></form>
   </section>
-  <section class="wrap sec"><div class="grid g4" id="gl">${D.gloss.map(g => `<dl class="sp gl" data-t="${esc((g.k + g.v).toLowerCase())}"><dt>${esc(g.k)}</dt><dd>${esc(g.v)}</dd></dl>`).join('')}</div></section>`, 'gloss', '术语表');
+  <section class="wrap sec"><div class="glist" id="gl">${D.gloss.map(g => `<dl class="gl" data-t="${esc((g.k + g.v).toLowerCase())}"><dt>${esc(g.k)}</dt><dd>${esc(g.v)}</dd></dl>`).join('')}</div></section>`, 'gloss', '术语表');
   $('#gf').onsubmit = e => e.preventDefault();
   $('#gq').oninput = e => { const t = e.target.value.trim().toLowerCase(); $$('#gl .gl').forEach(x => x.hidden = t && !x.dataset.t.includes(t)); };
 }

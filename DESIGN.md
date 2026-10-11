@@ -1,28 +1,10 @@
-# Visual system — Studio Ink (v5 · full rebuild)
+# Visual system — Ink & Paper (v6)
 
-Reading site for 《高性价比人生指南》. Scrap Warm Paper / Clarity Docs / Quiet Luxury navy / VitePress blue pills.
+Compact reading site for 《高性价比人生指南》. Replaces Studio Ink (zinc + gold, mega cards).
 
-## Direction
-
-Refined fancy library landing — could sit next to Aceternity / Magic UI / Cult UI / React Bits / Beautiful UI / 21st.dev.
-
-| Keep | Change |
-|---|---|
-| Content, filters, `#e-1-16`, CC BY | Dark-first zinc + amber gold accent (not docs blue, not cyan, not parchment) |
-| Card anatomy (说人话 / 成本 / 收益 / 来源) | Text nav with underline (no blue pills); mega-stat strip; notes rail |
-| Search / chapters / docs | Instrument Serif hero; elevated cards with hover lift; dot-grid + soft glow |
-
-## Inspiration
-
-1. **Cult UI / shadcn blocks** — extreme type hierarchy, text nav, monochrome restraint
-2. **Aceternity / Beautiful UI** — elevated dark cards, hairline borders, soft shine
-3. **React Bits / 21st.dev** — atmospheric glow, intentional surfaces, not flat grey boxes
-4. **Magic UI** — subtle grid, bold hero, one accent done well
-5. **Original eternity4719 site** — sidebar filters, evidence colors, cost/gain rows
-
-## Non-goals
-
-- Not VitePress / Clarity Docs blue pill nav + grey stat boxes
-- Not UI Hub electric cyan
-- Not Warm Editorial parchment
-- Not changing entry text
+- Palette: off-white #fbfbfa + ink #18181b + one restrained indigo accent (#4f46e5 / dark #8b8cff). True-dark mirror #0c0c0e.
+- Layout: list/rail, hairline dividers, ink rule under section heads. No mega stat cards, no disclaimer slabs, no bento.
+- Type: Geist, tight headings (650, -0.02em), mono for numbers.
+- Entries are list rows (number gutter + title, small 4px-radius badges, 说人话 left rule, cost/gain rows).
+- Sidebar: left-aligned number + title rows, compact chips, tight group rhythm.
+- Keep: 677 entries, filters, #e-1-16 deep links, CC BY 4.0 attribution.
