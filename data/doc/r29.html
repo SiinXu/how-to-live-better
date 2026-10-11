@@ -1,0 +1,85 @@
+<h1>排查：备注里的文献链接 · 记录（2026-09-21）</h1>
+<p>任务来源：用户在检索页上读到<a class="xr" href="#/c/2/1" title="第 2 节第 1 条：戒烟，越早越好">第 2 节第 1 条</a>（戒烟）的备注，里面嵌着一整串英文题录，说「这里怎么还有啊，读者都是中国人，你整个一长串这些放着」。</p>
+<p>此前同一天已经处理过两条（<a class="xr" href="#/c/2/41" title="第 2 节第 41 条：做饭用植物油代替猪油和黄油，不必为了健康换着买油，也别指望亚麻籽油护心">第 2 节第 41 条</a>夜班、<a class="xr" href="#/c/6/26" title="第 6 节第 26 条：不要指望吃早餐或 16:8 轻断食帮你控制体重，吃饭时间挑你能长期坚持的">第 6 节第 26 条</a>早餐），当时只修了链接最多的两条，没做全书扫查。这一轮补齐。</p>
+<h2>判据与口径</h2>
+<ul>
+<li><strong>文献链接一律进「来源」栏，备注不放。</strong> 备注里至多留一个链接，且只能是指向 docs/ 长文的相对链接。</li>
+<li>依据：CLAUDE.md 的通俗化规则明写「<strong>来源栏除外</strong>，文献题录和条款号照原样留着才能核对」——言下之意，英文题录的容身处就是来源栏。备注是给中国读者读的中文正文，塞进一串英文题名和 DOI 既读不懂也不该读。</li>
+<li>扫描命令：<code>grep -c http</code> 扫全书所有 <code>- 备注：</code> 行。</li>
+</ul>
+<h2>处理前后</h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>处理前</th>
+<th>处理后</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>备注里带链接的条目</td>
+<td>19 条（其中 11 条是整串英文题录嵌在中文里）</td>
+<td><strong>0 条</strong></td>
+</tr>
+<tr>
+<td>单条备注最多链接数</td>
+<td>3 个</td>
+<td>0 个</td>
+</tr>
+<tr>
+<td>全书文献链接总数</td>
+<td>1234</td>
+<td><strong>1234（未变）</strong></td>
+</tr>
+</tbody>
+</table>
+<p>链接总数不变是这轮的核心不变量：<strong>题录是从备注挪到来源栏，不是删掉</strong>。挪进来源时给每条加了一个中文小尾巴说明它撑的是哪个说法（「（争议方）」「（备注里那项高纯度处方鱼油试验）」之类），免得来源栏变成一串看不出用途的题录。</p>
+<h2>逐条清单</h2>
+<p>第 1 节：第 20 条（流感疫苗 Cochrane）、第 28 条（PrEP，Fonner 2016）、第 29 条（窗口期，广东疾控页面）。
+第 2 节：第 1 条（二手烟 Oberg 2011）、第 9 条（低钠盐争议方 PURE）、第 19 条（加工肉争议方 NutriRECS 指南）、第 20 条（饮酒争议方 Di Castelnuovo 2006）、第 34 条（BMI 争议方 Flegal 2013）、第 41 条（夜班癌症两篇 + 光照 Czeisler，先一轮已处理）。
+第 3 节：第 9 条（两篇争议方 Grubbs 2018、Prause &amp; Pfaus 2015）。
+第 5 节：第 17 条（指数基金争议方 Harvey &amp; Liu 2022）。
+第 6 节：第 1 条（复合维生素 Gaziano 2012）、第 2 条（鱼油 Bhatt 2019 REDUCE-IT）、第 26 条（早餐三篇，先一轮已处理）。
+第 10 节：第 3 条（Perilloux &amp; Kurzban 2015）、第 6 条（Dargie 2015）。
+第 20 节：第 12 条（一般婴儿试验 EAT，Perkin 2016）。
+第 29 节：第 4 条（Kristensen 2012）、第 9 条（Stroebe 2007）。</p>
+<h2>补全的题名</h2>
+<p>有 5 条原来在备注里是缩写形式（只有作者、年份、期刊），挪进来源栏要补题名。<strong>没有凭记忆写</strong>，逐条用 Crossref 按 DOI 取回：</p>
+<table>
+<thead>
+<tr>
+<th>DOI</th>
+<th>取回的题名</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>10.1097/QAD.0000000000001145</td>
+<td>Effectiveness and safety of oral HIV preexposure prophylaxis for all populations（AIDS, 2016）</td>
+</tr>
+<tr>
+<td>10.1001/jama.2012.14641</td>
+<td>Multivitamins in the Prevention of Cancer in Men（JAMA, 2012）</td>
+</tr>
+<tr>
+<td>10.1056/NEJMoa1812792</td>
+<td>Cardiovascular Risk Reduction with Icosapent Ethyl for Hypertriglyceridemia（NEJM, 2019）</td>
+</tr>
+<tr>
+<td>10.1007/s10508-018-1248-x</td>
+<td>Pornography Problems Due to Moral Incongruence: An Integrative Model with a Systematic Review and Meta-Analysis（Arch Sex Behav，<strong>Crossref 记的年份是 2018 不是原文写的 2019</strong>，已按 2018 写）</td>
+</tr>
+<tr>
+<td>10.1002/sm2.58</td>
+<td>Viewing Sexual Stimuli Associated with Greater Sexual Responsiveness, Not Erectile Dysfunction（Sexual Medicine, 2015）</td>
+</tr>
+</tbody>
+</table>
+<h2>校验</h2>
+<ul>
+<li>全书 <code>- 备注：</code> 行含 http 的条数：<strong>0</strong>。</li>
+<li>删除引文后扫了一遍标点，没有留下双句号、空括号或孤立的「。」。</li>
+<li><code>node tools/check-refs.mjs --check</code>：454 处引用全部指向正确且带锚点，条数未变。</li>
+<li><code>sync-stats.ps1</code>：条目 600、A 404、链接 1234，八处统计位一个没动。</li>
+</ul>
