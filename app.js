@@ -30,14 +30,46 @@ const docCache = {};
 $('#theme').onclick = () => {
   const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = t;
-  $('meta[name=theme-color]').content = t === 'dark' ? '#0c0c0e' : '#fbfbfa';
-  try { localStorage.setItem('htlb-theme-v6', t); } catch (e) {}
+  $('meta[name=theme-color]').content = t === 'dark' ? '#07070b' : '#fafafc';
+  try { localStorage.setItem('htlb-theme-v7', t); } catch (e) {}
 };
 addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 8), { passive: true });
 $('#sbtn').onclick = () => { location.hash = '#/search'; setTimeout(() => $('#q')?.focus(), 60); };
 addEventListener('keydown', e => {
   if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName)) { e.preventDefault(); $('#sbtn').click(); }
 });
+/* ---------- motion: spotlight, reveal, ticker ---------- */
+const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+document.addEventListener('pointermove', e => {
+  const el = e.target.closest && e.target.closest('.spot');
+  if (!el) return;
+  const r = el.getBoundingClientRect();
+  el.style.setProperty('--mx', (e.clientX - r.left) + 'px');
+  el.style.setProperty('--my', (e.clientY - r.top) + 'px');
+}, { passive: true });
+const rvIO = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(en => {
+  if (en.isIntersecting) { en.target.classList.add('in'); rvIO.unobserve(en.target); }
+}), { rootMargin: '0px 0px -6% 0px' }) : null;
+function reveal(root = app) {
+  $$('.rv:not(.in)', root).forEach((el, i) => {
+    if (!rvIO || RM) { el.classList.add('in'); return; }
+    if (!el.style.getPropertyValue('--d')) el.style.setProperty('--d', Math.min(i, 8) * 50 + 'ms');
+    rvIO.observe(el);
+  });
+  $$('[data-count]', root).forEach(el => {
+    const to = +el.dataset.count; if (RM || !to) { el.textContent = to.toLocaleString(); return; }
+    const t0 = performance.now(), dur = 1100;
+    const step = now => { const p = Math.min(1, (now - t0) / dur), k = 1 - Math.pow(1 - p, 4); el.textContent = Math.round(to * k).toLocaleString(); if (p < 1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+function moveInd() {
+  const on = $('#tabs a.on'), ind = $('#tabind'); if (!ind) return;
+  if (!on) { ind.style.opacity = 0; return; }
+  ind.style.opacity = 1; ind.style.width = on.offsetWidth + 'px'; ind.style.transform = `translateX(${on.offsetLeft}px)`;
+}
+addEventListener('resize', moveInd);
+document.fonts && document.fonts.ready.then(moveInd);
 function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('show'), 1800); }
 document.addEventListener('click', e => {
   const a = e.target.closest('a[href^="#"]');
@@ -71,7 +103,7 @@ fetch('data/book.json').then(r => r.json()).then(d => {
 }).catch(() => { app.innerHTML = '<div class="wrap empty">数据没加载出来，刷新试试。</div>'; });
 addEventListener('hashchange', route);
 
-function setNav(r) { $$('#tabs a,#bottom a').forEach(a => a.classList.toggle('on', a.dataset.r === r)); }
+function setNav(r) { $$('#tabs a,#bottom a').forEach(a => a.classList.toggle('on', a.dataset.r === r)); moveInd(); }
 function parseHash() {
   // Accept original deep links like #e-1-16
   const raw = location.hash.replace(/^#/, '');
@@ -105,6 +137,7 @@ function render(html, nav, title) {
   app.innerHTML = html; setNav(nav);
   document.title = (title ? title + ' · ' : '') + '高性价比人生指南';
   $$('.prose table', app).forEach(t => { if (!t.parentElement.classList.contains('tw')) { const w = document.createElement('div'); w.className = 'tw'; t.before(w); w.append(t); } });
+  reveal();
 }
 
 /* ---------- pieces ---------- */
@@ -142,81 +175,92 @@ function formatSrc(html) {
 
 function entryHTML(e, o = {}) {
   const t = o.terms;
-  const rc = { '极高': 'r3', '高': 'r2', '一般': 'plain' }[e.r] || 'plain';
-  const costPills = ['m', 'ti', 'w'].map(k => LABEL[k][e[k]] ? `<span class="bd plain">${LABEL[k][e[k]]}</span>` : '').join('');
-  const noteRow = e.note ? `<div class="k">备注</div><div class="v note">${hl(e.note, t)}</div>` : '';
-  return `<article class="entry card" id="e${e.c}-${e.n}">
-    <div class="eh card-h"><span class="en idx">${e.n}</span><h3>${hl(esc(e.t), t)}</h3><button class="cp anchor" data-copy="#/c/${e.c}/${e.n}" aria-label="复制链接" title="复制这条的链接">#</button></div>
-    <div class="badges">
-      ${o.showCh ? `<a class="bd ch" href="#/c/${e.c}/${e.n}">第 ${e.c} 节 · ${esc(CH[e.c].t)}</a>` : ''}
-      <span class="bd ${rc}" title="作者判断：由收益量级与三项成本合成，同口径内可比">性价比 ${e.r}</span>
-      <span class="bd g g${e.g}" title="证据等级">证据 ${e.g} 级</span>
-      <span class="bd plain">${LENS[e.ln] || e.ln}</span>
-      ${costPills}
-      ${e.dp ? '<span class="bd dp">争议</span>' : ''}${e.todo ? '<span class="bd dp">含待核实</span>' : ''}
+  const rc = { '极高': 'r3', '高': 'r2', '一般': 'r1' }[e.r] || 'r1';
+  const cost = ['m', 'ti', 'w'].map(k => LABEL[k][e[k]] ? `<span class="tg${e[k] === ZERO[k] ? ' z' : ''}">${LABEL[k][e[k]]}</span>` : '').join('');
+  return `<article class="entry spot" id="e${e.c}-${e.n}">
+    <header class="eh">
+      <span class="en">${pad(e.n)}</span>
+      <h3>${hl(esc(e.t), t)}</h3>
+      <button class="cp" data-copy="#/c/${e.c}/${e.n}" aria-label="复制链接" title="复制这条的链接">${LINK}</button>
+    </header>
+    <div class="meta-row">
+      ${o.showCh ? `<a class="tg chl" href="#/c/${e.c}/${e.n}">${pad(e.c)} · ${esc(CH[e.c].t)}</a>` : ''}
+      <span class="rate ${rc}" title="作者判断：由收益量级与三项成本合成，同口径内可比">性价比 ${e.r}</span>
+      <span class="gd g${e.g}" title="证据等级 ${esc(e.gfull || e.g)}"><i></i>证据 ${e.g}</span>
+      <span class="tg ln">${ICON[e.ln] || ''}${LENS[e.ln] || e.ln}</span>
+      <span class="costs">${cost}</span>
+      ${e.dp ? '<span class="tg warn">争议</span>' : ''}${e.todo ? '<span class="tg warn">含待核实</span>' : ''}
     </div>
-    ${e.human ? `<div class="human"><span class="lb">说人话</span>${hl(e.human, t)}</div>` : ''}
-    <div class="rows">
-      <div class="k">成本</div><div class="v">${hl(e.cost, t)}</div>
-      <div class="k">收益</div><div class="v">${hl(e.gain, t)}</div>
-      ${noteRow}
+    ${e.human ? `<p class="human"><span class="lb">说人话</span><span>${hl(e.human, t)}</span></p>` : ''}
+    <div class="cg">
+      <div class="col cost"><div class="k">成本 · 花掉什么</div><div class="v">${hl(e.cost, t)}</div></div>
+      <div class="col gain"><div class="k">收益 · 换回什么</div><div class="v">${hl(e.gain, t)}</div></div>
     </div>
-    <details class="src"${o.open ? ' open' : ''}><summary>来源<span class="cnt"> · 证据 ${esc(e.gfull || e.g)}</span></summary><div class="body">${formatSrc(e.src)}</div></details>
+    ${e.note ? `<div class="note"><span class="k">备注</span><div>${hl(e.note, t)}</div></div>` : ''}
+    <details class="src"${o.open ? ' open' : ''}><summary><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>来源与出处<span class="cnt">证据 ${esc(e.gfull || e.g)}</span></summary><div class="body">${formatSrc(e.src)}</div></details>
   </article>`;
 }
 
 /* ---------- home ---------- */
 function home() {
   const m = D.meta, s = m.stats;
-  const res = m.res4.map(r => {
+  const res = m.res4.map((r, i) => {
     const ln = RES_LENS[r.k];
-    return `<a class="res" href="#/search?ln=${encodeURIComponent(ln)}"><span class="rk">${ICON[ln]}${esc(r.k)}<span class="rn">${m.lensN[ln]}</span></span><span class="rv">${esc(r.v)}</span></a>`;
+    return `<a class="res spot rv" href="#/search?ln=${encodeURIComponent(ln)}"><span class="ri">${ICON[ln]}</span><span class="rn" data-count="${m.lensN[ln]}">${m.lensN[ln]}</span><b>${esc(r.k)}</b><small>${esc(r.v)}</small><span class="go">看这类 ${ARROW}</span></a>`;
   }).join('');
-  const chs = D.ch.map(c => `<a class="crow" href="#/c/${c.n}"><span class="cn">${pad(c.n)}</span><span class="ct"><b>${esc(c.t)}</b><small>${esc(D.q[c.n] || '')}</small></span><span class="cm">${evBar(c)}<span class="cc">${c.e.length}</span></span></a>`).join('');
+  const chs = D.ch.map(c => `<a class="cell spot rv" href="#/c/${c.n}"><span class="cn">${pad(c.n)}</span><b>${esc(c.t)}</b><small>${esc(D.q[c.n] || '')}</small><span class="cf">${evBar(c)}<span class="cc">${c.e.length} 条${c.cnt.A ? ` · A ${c.cnt.A}` : ''}</span>${ARROW}</span></a>`).join('');
   const longs = D.docs.filter(d => d.kind === 'doc').map(docRow).join('');
-  const notes = m.notes.map((n, i) => `<p><span class="nk">${['怎么用', '注意', '声明'][i] || ''}</span>${n}</p>`).join('');
+  const notes = m.notes.map((n, i) => `<div class="nt rv"><span class="nk">${['怎么用', '注意', '声明'][i] || ''}</span><p>${n}</p></div>`).join('');
+  const qs = D.ch.filter(c => D.q[c.n]).map(c => `<a href="#/c/${c.n}"><span>${pad(c.n)}</span>${esc(D.q[c.n])}</a>`);
+  const half = Math.ceil(qs.length / 2);
+  const row = arr => `<div class="mq-track">${arr.join('')}${arr.join('').replace(/<a /g, '<a aria-hidden="true" tabindex="-1" ')}</div>`;
   render(`
   <section class="wrap hero">
-    <div class="hl">
-      <p class="eyebrow">高性价比人生指南 · eternity4719 · CC BY 4.0</p>
-      <h1>用最少的钱、时间和精力，换回最多的<span class="ac">寿命、金钱和人身自由</span>。</h1>
-      <p class="lede">${esc(m.lede[0])}</p>
-      <form class="hsearch" id="hs" role="search">${SEARCH}<input id="hq" type="search" placeholder="搜 ${s.entries} 条建议，比如「低钠盐」「担保」「被裁」" autocomplete="off"><kbd>↵</kbd></form>
-      <div class="quick">
-        <a class="chip" href="#/search?r=极高">性价比极高 <span class="n">${s['极高']}</span></a>
-        <a class="chip" href="#/search?g=A">证据 A <span class="n">${s.A}</span></a>
-        <a class="chip" href="#/search?r=极高&g=A">极高 × A</a>
-        <a class="chip" href="#/c/13">紧急情况</a>
-        <a class="chip" href="#/docs">场景清单</a>
-      </div>
+    <a class="announce rv" href="#/about"><span class="pulse"></span><span>同步原仓库 <code>${m.commit.slice(0, 7)}</code> · eternity4719 · CC BY 4.0</span>${CHEV}</a>
+    <h1 class="rv">用最少的钱、时间和精力，<br>换回最多的<span class="grad">寿命、金钱和人身自由</span></h1>
+    <p class="lede rv">${esc(m.lede[0])}</p>
+    <form class="hsearch beam rv" id="hs" role="search">${SEARCH}<input id="hq" type="search" placeholder="搜 ${s.entries} 条建议，比如「低钠盐」「担保」「被裁」" autocomplete="off"><kbd>↵</kbd></form>
+    <div class="quick rv">
+      <a class="pill hot" href="#/search?r=极高">性价比极高 <span class="n">${s['极高']}</span></a>
+      <a class="pill" href="#/search?g=A">证据 A <span class="n">${s.A}</span></a>
+      <a class="pill" href="#/search?r=极高&g=A">极高 × A</a>
+      <a class="pill" href="#/c/13">紧急情况</a>
+      <a class="pill" href="#/docs">场景清单</a>
     </div>
-    <aside class="hr">
-      <dl class="facts">
-        <div><dt>建议</dt><dd>${s.entries}<small>/ ${D.ch.length} 节</small></dd></div>
-        <div><dt>证据 A</dt><dd>${s.A}<small>有数字、可核</small></dd></div>
-        <div><dt>性价比极高</dt><dd>${s['极高']}<small>作者判断</small></dd></div>
-        <div><dt>原始文献</dt><dd>${m.links.toLocaleString()}<small>见核实记录</small></dd></div>
-      </dl>
-      <p class="lede2">${esc(m.lede[1])}</p>
-    </aside>
+    <dl class="stats rv">
+      <div><dt>条建议</dt><dd data-count="${s.entries}">${s.entries}</dd></div>
+      <div><dt>节正文</dt><dd data-count="${D.ch.length}">${D.ch.length}</dd></div>
+      <div><dt>证据 A 级</dt><dd data-count="${s.A}">${s.A}</dd></div>
+      <div><dt>条原始文献</dt><dd data-count="${m.links}">${m.links.toLocaleString()}</dd></div>
+    </dl>
   </section>
-  <section class="wrap notes">${notes}</section>
-  <section class="wrap sec"><header class="sh"><h2>四种资源</h2><span>想帮你多留住的 · 不跨口径比较</span></header><div class="res4">${res}</div></section>
-  <section class="wrap sec"><header class="sh"><h2>目录</h2><span>${D.ch.length} 节 · 每节按性价比排 · 色条为证据 <i class="lg a"></i>A <i class="lg b"></i>B <i class="lg c"></i>C</span></header><div class="clist">${chs}</div></section>
+  <section class="mq" aria-label="各节在回答的问题"><div class="mq-row">${row(qs.slice(0, half))}</div><div class="mq-row rev">${row(qs.slice(half))}</div></section>
+  <section class="wrap sec">
+    <header class="sh rv"><span class="kicker">01</span><h2>四种资源</h2><p>这本书想帮你多留住的东西。不同资源之间不跨口径比较。</p></header>
+    <div class="res4">${res}</div>
+  </section>
+  <section class="wrap sec">
+    <header class="sh rv"><span class="kicker">02</span><h2>目录</h2><p>${D.ch.length} 节，每节内按性价比从高到低排。色条是证据构成：<i class="lg a"></i>A <i class="lg b"></i>B <i class="lg c"></i>C</p></header>
+    <div class="cgrid">${chs}</div>
+  </section>
+  <section class="wrap sec">
+    <header class="sh rv"><span class="kicker">03</span><h2>读之前</h2><p>原书 README 的三条提醒。</p></header>
+    <div class="notes">${notes}</div>
+  </section>
   <section class="wrap sec two">
-    <div><header class="sh"><h2>长文与场景清单</h2><a href="#/docs">全部 →</a></header><div class="dlist">${longs}</div></div>
-    <div><header class="sh"><h2>怎么读</h2><a href="#/about">完整说明 →</a></header><div class="dlist">
-      <a class="drow" href="#/about"><b>证据分级 A / B / C</b><small>A 有具体数字、出处可核；B 有研究支持但说不出确切数字；C 是作者经验或公认做法。</small><span class="dm">A ${s.A} · B ${s.B} · C ${s.C}</span></a>
-      <a class="drow" href="#/about"><b>性价比 极高 / 高 / 一般</b><small>由收益量级和三项成本合出来，是作者自己的判断，不是证据。</small><span class="dm">${s['极高']} · ${s['高']} · ${s['一般']}</span></a>
-      <a class="drow" href="#/gloss"><b>术语表</b><small>总死亡率、HR、RR、95% CI、荟萃分析的大白话解释。</small><span class="dm">${D.gloss.length} 条</span></a>
-      <a class="drow" href="#/rec"><b>核实记录</b><small>每条来源打开了哪个链接、原文怎么写、哪些没采用。</small><span class="dm">${D.docs.filter(d => d.kind === 'rec').length} 份</span></a>
+    <div><header class="sh sm rv"><span class="kicker">04</span><h2>长文与场景清单</h2><a class="more" href="#/docs">全部 ${ARROW}</a></header><div class="dlist">${longs}</div></div>
+    <div><header class="sh sm rv"><span class="kicker">05</span><h2>怎么读</h2><a class="more" href="#/about">完整说明 ${ARROW}</a></header><div class="dlist">
+      <a class="drow spot rv" href="#/about"><b>证据分级 A / B / C</b><small>A 有具体数字、出处可核；B 有研究支持但说不出确切数字；C 是作者经验或公认做法。</small><span class="dm">A ${s.A} · B ${s.B} · C ${s.C}</span></a>
+      <a class="drow spot rv" href="#/about"><b>性价比 极高 / 高 / 一般</b><small>由收益量级和三项成本合出来，是作者自己的判断，不是证据。</small><span class="dm">${s['极高']} · ${s['高']} · ${s['一般']}</span></a>
+      <a class="drow spot rv" href="#/gloss"><b>术语表</b><small>总死亡率、HR、RR、95% CI、荟萃分析的大白话解释。</small><span class="dm">${D.gloss.length} 条</span></a>
+      <a class="drow spot rv" href="#/rec"><b>核实记录</b><small>每条来源打开了哪个链接、原文怎么写、哪些没采用。</small><span class="dm">${D.docs.filter(d => d.kind === 'rec').length} 份</span></a>
     </div></div>
   </section>`, 'home');
   $('#hs').onsubmit = e => { e.preventDefault(); location.hash = '#/search?q=' + encodeURIComponent($('#hq').value.trim()); };
 }
 function docRow(d) {
   const mins = Math.max(1, Math.round(d.chars / 500));
-  return `<a class="drow" href="#/${d.kind === 'rec' ? 'rec' : 'doc'}/${d.id}"><b>${esc(d.title)}</b><small>${esc(d.lead)}</small><span class="dm">${mins} 分钟</span></a>`;
+  return `<a class="drow spot rv" href="#/${d.kind === 'rec' ? 'rec' : 'doc'}/${d.id}"><b>${esc(d.title)}</b><small>${esc(d.lead)}</small><span class="dm">${mins} 分钟</span></a>`;
 }
 const docCard = docRow;
 
@@ -226,22 +270,23 @@ function chapter(n, focus, same) {
   const c = CH[n]; if (!c) return home();
   if (cf.n !== n) cf = { n, g: new Set(), r: new Set(), ln: new Set(), q: '' };
   if (!same || !$('#elist')) {
-    const sideLinks = D.ch.map(x => `<a href="#/c/${x.n}" class="${x.n === n ? 'on' : ''}"><span>${pad(x.n)}</span>${esc(x.t)}</a>`).join('');
+    const sideLinks = D.ch.map(x => `<a href="#/c/${x.n}" class="${x.n === n ? 'on' : ''}" title="${esc(x.t)}"><span class="sn">${pad(x.n)}</span><span class="st">${esc(x.t)}</span><span class="sc">${x.e.length}</span></a>`).join('');
     const prev = CH[n - 1], next = CH[n + 1];
     render(`<div class="wrap cpage">
       <aside class="side" id="cside">
         <div class="group"><div class="gt">性价比 <small>作者判断，同口径内可比</small></div><div class="chips" id="side-r">${['极高','高','一般'].map(r => `<button class="chip" data-r="${r}" aria-pressed="false">${r}</button>`).join('')}</div></div>
         <div class="group"><div class="gt">证据等级 <small>荟萃/RCT · 研究 · 共识</small></div><div class="chips" id="side-g">${['A','B','C'].map(g => `<button class="chip" data-g="${g}" aria-pressed="false">${g} 级 <span class="n">${c.cnt[g]}</span></button>`).join('')}</div></div>
         <div class="group"><div class="gt">换回什么 <small>不跨口径比较</small></div><div class="chips" id="side-ln">${LENS_ORDER.map(k => `<button class="chip" data-ln="${k}" aria-pressed="false">${LENS[k]}</button>`).join('')}</div></div>
-        <div class="group"><div class="gt">章节 <small>${D.ch.length} 节 · 一次只看一个</small></div>${sideLinks}</div>
+        <div class="group"><div class="gt">章节 <small>${D.ch.length} 节</small></div><nav class="snav">${sideLinks}</nav></div>
         <p class="hint">同组多选是「或」，不同组是「且」。每节内按性价比从高到低排。</p>
       </aside>
       <div>
         <div class="mchap"><select id="chsel" aria-label="切换章节">${D.ch.map(x => `<option value="${x.n}"${x.n === n ? ' selected' : ''}>${pad(x.n)} · ${esc(x.t)}</option>`).join('')}</select></div>
         <header class="chead">
-          <p class="eyebrow">第 ${pad(n)} 节 · ${c.e.length} 条 · A ${c.cnt.A} · 极高 ${c.cnt['极高']}</p>
-          <h1><span class="no">${n}.</span>${esc(c.t)}</h1>
+          <p class="crumbs"><a href="#/">首页</a>${CHEV}<span>正文</span>${CHEV}<span>第 ${pad(n)} 节</span></p>
+          <h1><span class="no">${pad(n)}</span><span class="tt">${esc(c.t)}</span></h1>
           ${D.q[n] ? `<p class="q">${esc(D.q[n])}</p>` : ''}
+          <div class="cstat"><span><b>${c.e.length}</b>条建议</span><span><b>${c.cnt.A}</b>证据 A</span><span><b>${c.cnt['极高']}</b>性价比极高</span>${evBar(c)}</div>
         </header>
         <details class="intro"${c.e.length ? '' : ' open'}><summary>本节导读与分组索引<svg class="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg></summary><div class="body">${c.intro}</div></details>
         <div class="fbar" id="fbar">
@@ -253,8 +298,8 @@ function chapter(n, focus, same) {
           <span class="cnt" id="ccnt"></span>
         </div>
         <div class="elist" id="elist"></div>
-        <nav class="pager">${prev ? `<a class="pg" href="#/c/${prev.n}"><small>← 第 ${prev.n} 节</small><b>${esc(prev.t)}</b></a>` : ''}${next ? `<a class="pg nx" href="#/c/${next.n}"><small>第 ${next.n} 节 →</small><b>${esc(next.t)}</b></a>` : ''}</nav>
-        <p class="meta" style="margin-top:20px">原文：<a href="${GH}/blob/main/book/${encodeURIComponent(c.file)}" target="_blank" rel="noopener" style="text-decoration:underline">book/${esc(c.file)}</a></p>
+        <nav class="pager">${prev ? `<a class="pg spot" href="#/c/${prev.n}"><small>← 第 ${prev.n} 节</small><b>${esc(prev.t)}</b></a>` : ''}${next ? `<a class="pg nx spot" href="#/c/${next.n}"><small>第 ${next.n} 节 →</small><b>${esc(next.t)}</b></a>` : ''}</nav>
+        <p class="meta srcline">原文：<a href="${GH}/blob/main/book/${encodeURIComponent(c.file)}" target="_blank" rel="noopener" style="text-decoration:underline">book/${esc(c.file)}</a></p>
       </div></div>`, 'c', c.t);
     $('#chsel').onchange = e => location.hash = '#/c/' + e.target.value;
     $('#cq').oninput = e => { cf.q = e.target.value.trim().toLowerCase(); drawEntries(c); };
@@ -262,7 +307,7 @@ function chapter(n, focus, same) {
     $$('#fbar [data-g], #side-g [data-g]').forEach(b => b.onclick = () => { toggleSet(cf.g, b.dataset.g); drawEntries(c); });
     $$('#fbar [data-r], #side-r [data-r]').forEach(b => b.onclick = () => { toggleSet(cf.r, b.dataset.r); drawEntries(c); });
     $$('#side-ln [data-ln]').forEach(b => b.onclick = () => { toggleSet(cf.ln, b.dataset.ln); drawEntries(c); });
-    const on = $('.side a.on'); if (on) on.scrollIntoView({ block: 'center' });
+    const on = $('.side a.on'), sn = $('.snav'); if (on && sn) sn.scrollTop = on.offsetTop - sn.clientHeight / 2;
     if (!focus) scrollTo(0, 0);
   }
   if (focus) { cf.g.clear(); cf.r.clear(); cf.ln.clear(); cf.q = ''; if ($('#cq')) $('#cq').value = ''; }
@@ -280,6 +325,7 @@ function drawEntries(c) {
   $$('#side-ln [data-ln]').forEach(b => { const on = cf.ln.has(b.dataset.ln); b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
   $('#ccnt').textContent = list.length === c.e.length ? `${c.e.length} 条` : `${list.length} / ${c.e.length} 条`;
   $('#elist').innerHTML = list.length ? list.map(e => entryHTML(e, { terms })).join('') : '<div class="empty">没有符合条件的条目</div>';
+  reveal($('#elist'));
 }
 
 /* ---------- search ---------- */
@@ -339,6 +385,7 @@ function sDraw(append) {
   $('#scount').innerHTML = any ? `找到 <b>${list.length}</b> 条 · 每节内按性价比排` : `全部 <b>${list.length}</b> 条，按节、按性价比排`;
   $('#sgrid').innerHTML = list.length ? list.slice(0, sShown).map(e => entryHTML(e, { showCh: true, terms: s.terms })).join('') : '<div class="empty">没找到。换个说法，或者少勾几个条件。</div>';
   $('#smore').hidden = list.length <= sShown;
+  reveal($('#sgrid'));
   const p = new URLSearchParams();
   if (s.q) p.set('q', s.q); if (s.ch) p.set('ch', s.ch); if (s.dp) p.set('dp', '1');
   for (const [k] of SF) if (s[k].size) p.set(k, [...s[k]].join(','));
