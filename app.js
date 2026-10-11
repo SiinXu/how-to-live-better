@@ -30,7 +30,7 @@ const docCache = {};
 $('#theme').onclick = () => {
   const t = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = t;
-  $('meta[name=theme-color]').content = t === 'dark' ? '#06070b' : '#f5f6fa';
+  $('meta[name=theme-color]').content = t === 'dark' ? '#161310' : '#f4efe6';
   try { localStorage.setItem('htlb-theme', t); } catch (e) {}
 };
 addEventListener('scroll', () => $('#top').classList.toggle('scrolled', scrollY > 8), { passive: true });
