@@ -1,0 +1,24 @@
+<h1>人生決策 skill（life-decision-guide）</h1>
+<p>讓 AI 助手照《高性價比人生指南》回答具體問題：該不該做、值不值、怎麼選、出事了先做什麼、能領哪筆錢、這麼幹犯不犯法。</p>
+<p>它做的事只有一件：<strong>先把相關條目從正文裡查出來，再照書的算賬方式排序回答</strong>，每條註明出自第幾節第幾條。查不到就說查不到，不憑記憶編數字。</p>
+<p>規則全在 <a href="https://github.com/eternity4719/HowToLiveBetter/blob/main/SKILL.md" target="_blank" rel="noopener">SKILL.md</a> 裡，兩個工具共用同一個文件，不維護兩份。</p>
+<h2>裝到 Claude Code</h2>
+<p>在本倉庫裡開 Claude Code，不用裝——<code>.claude/skills/life-decision-guide/</code> 已經指向這份規則。</p>
+<p>想在任何目錄下都能用，複製到個人 skill 目錄：</p>
+<pre><code class="language-bash">mkdir -p ~/.claude/skills/life-decision-guide &amp;&amp; curl -fsSL -o ~/.claude/skills/life-decision-guide/SKILL.md &quot;https://raw.githubusercontent.com/eternity4719/HowToLiveBetter/main/skills/life-decision-guide/SKILL.md&quot;
+</code></pre>
+<p>之後直接問「每天通勤兩小時值不值」「朋友讓我替他擔保，籤不籤」就會觸發；也可以顯式說「用 life-decision-guide 回答」。</p>
+<h2>裝到 Codex</h2>
+<p>在本倉庫裡開 Codex，不用裝——根目錄的 <code>AGENTS.md</code> 已經把它指出來了。</p>
+<p>想在任何目錄下都能用，複製到 Codex 的個人 skill 目錄 <code>~/.agents/skills</code>：</p>
+<pre><code class="language-bash">mkdir -p ~/.agents/skills/life-decision-guide &amp;&amp; curl -fsSL -o ~/.agents/skills/life-decision-guide/SKILL.md &quot;https://raw.githubusercontent.com/eternity4719/HowToLiveBetter/main/skills/life-decision-guide/SKILL.md&quot;
+</code></pre>
+<p>之後直接問問題就會按描述自動觸發，也可以輸入 <code>$life-decision-guide</code> 顯式調用。注意是 <code>$</code> 不是 <code>/</code>，新版 Codex 輸入 <code>/life-decision-guide</code> 會報 <code>Unrecognized command</code>。沒出現就重啟一次 Codex。</p>
+<p>舊版 Codex 還沒有 skill，只能用自定義提示詞：把文件放到 <code>~/.codex/prompts/life-decision-guide.md</code>，再用 <code>/life-decision-guide</code> 調用。Codex 已宣佈棄用這套寫法（<a href="https://github.com/openai/codex/issues/10848" target="_blank" rel="noopener">openai/codex#10848</a>），新版用上面的 skill 裝法。</p>
+<h2>正文從哪來</h2>
+<p>本地有這個倉庫就讀本地的 <code>book/</code>；沒有就現取：</p>
+<pre><code class="language-bash">git clone --depth 1 https://github.com/eternity4719/HowToLiveBetter.git &quot;${TMPDIR:-/tmp}/hltb&quot;
+</code></pre>
+<p>整本 1.3 MB，淺克隆一次幾秒。取不到網絡就如實說取不到，不替代正文。</p>
+<h2>改動須知</h2>
+<p>SKILL.md 裡不留任何會跟著正文漂的清單和數值：節的清單去讀 README 的「這本書想回答的問題」表，性價比檔的算法去讀 <code>index.html</code> 裡的 <code>COST_W</code> 和 <code>e.ratio</code> 兩行。所以增刪節、改檔位規則都不用動這個目錄。</p>

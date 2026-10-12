@@ -1,0 +1,122 @@
+<h1>issue #28：八處條目補來源（2026-09-23）</h1>
+<p>任務來源：GitHub issue #28（dlgrv），提議給 8 處標著「作者經驗」「待核實」「TODO」的條目補原始文獻，每條附了引文和鏈接。issue 裡的引文只當線索，下表每一條都是本輪自己抓原文逐字核的。</p>
+<h2>逐條核對與處理</h2>
+<table>
+<thead>
+<tr>
+<th>條目</th>
+<th>來源</th>
+<th>複核</th>
+<th>原文要點</th>
+<th>處理</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a class="xr" href="#/c/13/18" title="第 13 節第 18 條：有人觸電，先斷電，再用乾燥的木棍之類挑開電源，不要直接上手拉">第 13 節第 18 條</a>（觸電）</td>
+<td><a href="https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-from-electrical-hazards.html" target="_blank" rel="noopener">https://www.cdc.gov/natural-disasters/response/what-to-do-protect-yourself-from-electrical-hazards.html</a></td>
+<td>是（curl 403，無頭 Chrome 取得）</td>
+<td>First aid 一節：「Look first. Don't touch. The person may still be in contact with the electrical source.」「Turn off the source of electricity if possible. If not, move the source away from you and the affected person using a non-conducting object made of cardboard, plastic or wood.」「If either has stopped or seems dangerously slow or shallow, begin cardiopulmonary resuscitation (CPR) immediately.」</td>
+<td>採納</td>
+</tr>
+<tr>
+<td>同上</td>
+<td><a href="https://doi.org/10.7326/0003-4819-145-7-200610030-00011" target="_blank" rel="noopener">https://doi.org/10.7326/0003-4819-145-7-200610030-00011</a>（Spies &amp; Trohman 2006）</td>
+<td>是（Europe PMC 摘要）</td>
+<td>「patients successfully resuscitated after cardiopulmonary arrest often have a favorable prognosis」</td>
+<td>採納</td>
+</tr>
+<tr>
+<td>同上</td>
+<td>Moran 1986 JAMA（10.1001/jama.1986.03370160055007）</td>
+<td>否</td>
+<td>Europe PMC 無摘要，內容核不了</td>
+<td>不採納</td>
+</tr>
+<tr>
+<td>同上</td>
+<td>ERC 2021 特殊情況心臟驟停（10.1016/j.resuscitation.2021.02.011）</td>
+<td>是（摘要）</td>
+<td>摘要列出的特殊原因、場景和人群裡都沒有觸電，issue 說「2021 版無觸電章節」屬實</td>
+<td>從來源欄刪掉；原來源欄說它「含觸電章節」是錯的</td>
+</tr>
+<tr>
+<td><a class="xr" href="#/c/20/9" title="第 20 節第 9 條：無論多累多氣都不要搖晃嬰兒">第 20 節第 9 條</a>（不搖晃嬰兒）</td>
+<td><a href="https://doi.org/10.15585/mmwr.mm6520a1" target="_blank" rel="noopener">https://doi.org/10.15585/mmwr.mm6520a1</a>（MMWR 2016）</td>
+<td>是（摘要）</td>
+<td>「During this period, AHT resulted in nearly 2,250 deaths among U.S. resident children aged &lt;5 years」</td>
+<td>採納</td>
+</tr>
+<tr>
+<td>同上</td>
+<td><a href="https://doi.org/10.1007/s00247-018-4149-1" target="_blank" rel="noopener">https://doi.org/10.1007/s00247-018-4149-1</a>（Choudhary 2018 共識聲明）</td>
+<td>是（摘要）</td>
+<td>「Abusive head trauma (AHT) is the leading cause of fatal head injuries in children younger than 2 years」；病因「multifactorial (shaking, shaking and impact, impact, etc.)」；「subdural hematoma… complex retinal hemorrhages」</td>
+<td>採納</td>
+</tr>
+<tr>
+<td>同上</td>
+<td>AAP 背書版（10.1542/peds.2018-1504）</td>
+<td>未核</td>
+<td>和共識聲明是同一內容的背書，不另加</td>
+<td>不採納</td>
+</tr>
+<tr>
+<td><a class="xr" href="#/c/13/27" title="第 13 節第 27 條：在戈壁、沙漠、無人區迷路或車壞了，留在原地或車旁，先報位置，再遮陽保溫，省水，不亂走">第 13 節第 27 條</a>（無人區）</td>
+<td><a href="https://www.nps.gov/articles/000/desertdrivingsafety.htm" target="_blank" rel="noopener">https://www.nps.gov/articles/000/desertdrivingsafety.htm</a></td>
+<td>是（curl 直取）</td>
+<td>「Staying with your car is the most important thing you can do in the event of an emergency. While not often, people have died from exposure trying to walk back to the paved roads.」</td>
+<td>採納，等級不變</td>
+</tr>
+<tr>
+<td><a class="xr" href="#/c/4/15" title="第 4 節第 15 條：給短視頻和無目的刷屏設硬上限">第 4 節第 15 條</a>（刷屏上限）</td>
+<td>CNNIC 第 56 次報告 PDF</td>
+<td>是（pdftotext 可逐字抽中文）</td>
+<td>第 821 行「截至 2025 年 6 月，我國網民的人均每週上網時長為 30.6 個小時，較 2024 年 12 月提升 1.9 個小時」；第 94 行「短視頻用戶規模達 10.68 億人，佔網民整體的 95.1%」</td>
+<td>採納，TODO 移除</td>
+</tr>
+<tr>
+<td><a class="xr" href="#/c/5/17" title="第 5 節第 17 條：用寬基指數基金替代主動管理基金作為長期底倉（長期拿著不動的那部分錢）">第 5 節第 17 條</a>（指數基金）</td>
+<td>SPIVA U.S. Scorecard Year-End 2024</td>
+<td>是（官網 403 且無頭 Chrome 被拒，按 Wayback 2025-05-12 快照核）</td>
+<td>「65% of all active large-cap U.S. equity funds underperformed the S&amp;P 500, worse than the 60% rate observed in 2023 and slightly above the 64% average annual rate reported over the 24-year history」；「Over the 15-year period ending December 2024, there were no categories in which a majority of active managers outperformed.」</td>
+<td>採納，TODO 移除。條目缺的是「長期」數字，所以除了 issue 引的單年 65%，另加 24 年均值和 15 年的結論</td>
+</tr>
+<tr>
+<td>同上</td>
+<td>SPIVA Institutional Scorecard Year-End 2024 PDF</td>
+<td>未用</td>
+<td>機構賬戶和 wrap 賬戶，普通讀者買不到這類產品</td>
+<td>不採納</td>
+</tr>
+<tr>
+<td><a class="xr" href="#/c/14/2" title="第 14 節第 2 條：郵箱密碼單獨一個，不和任何網站重複">第 14 節第 2 條</a>（郵箱密碼）</td>
+<td><a href="https://www.cisa.gov/secure-our-world/use-strong-passwords" target="_blank" rel="noopener">https://www.cisa.gov/secure-our-world/use-strong-passwords</a></td>
+<td>是（curl 直取）</td>
+<td>「Create long, random, unique passwords with a password manager」；「At least 16 characters—longer is stronger!」；「Use a different strong password for each account」</td>
+<td>採納，等級不變</td>
+</tr>
+<tr>
+<td><a class="xr" href="#/c/14/3" title="第 14 節第 3 條：手機設鎖屏密碼，SIM 卡設 PIN 碼">第 14 節第 3 條</a>（SIM 卡 PIN）</td>
+<td>FCC DOC-398483A1（2023-11-15 新聞稿）</td>
+<td>是（pdftotext）</td>
+<td>管的是運營商在轉號、換卡前核驗身份，針對的是「without ever gaining physical control of a consumer's phone」的換卡詐騙</td>
+<td><strong>不採納</strong>。條目防的是手機丟了、卡被拔下來插進別的手機，這正好是對方拿到了實體卡的情形，兩件事不是一回事</td>
+</tr>
+<tr>
+<td><a class="xr" href="#/c/14/4" title="第 14 節第 4 條：手機丟了按這個順序做：掛失 SIM 卡、遠程鎖定、改密碼、報警、凍結銀行卡">第 14 節第 4 條</a>（手機丟了）</td>
+<td><a href="https://www.fcc.gov/consumers/guides/protect-your-mobile-device" target="_blank" rel="noopener">https://www.fcc.gov/consumers/guides/protect-your-mobile-device</a></td>
+<td>是（curl 403，無頭 Chrome 取得）</td>
+<td>「Even if you think you may have only lost the device, you should remotely lock it to be safe. If the device was stolen, immediately report the theft to the police, including the make and model, serial and IMEI or MEID or ESN number.」「Immediately report the theft or loss to your service provider.」</td>
+<td>採納；步驟先後順序仍是作者經驗，來源欄寫明</td>
+</tr>
+</tbody>
+</table>
+<h2>定級</h2>
+<p><strong>只有兩條改了等級：<a class="xr" href="#/c/13/18" title="第 13 節第 18 條：有人觸電，先斷電，再用乾燥的木棍之類挑開電源，不要直接上手拉">第 13 節第 18 條</a>和<a class="xr" href="#/c/20/9" title="第 20 節第 9 條：無論多累多氣都不要搖晃嬰兒">第 20 節第 9 條</a>，都是 C 升 B。</strong> 兩條現在都有官方指南或專業共識，另有一篇研究支撐，但都沒有能直接換算成「做了少死多少」的數字，按口徑是 B。</p>
+<p>其餘幾條等級不變。官方機構的操作提示（NPS、CISA、FCC）不是研究，按本書慣例仍定 C（<a class="xr" href="#/c/13/27" title="第 13 節第 27 條：在戈壁、沙漠、無人區迷路或車壞了，留在原地或車旁，先報位置，再遮陽保溫，省水，不亂走">第 13 節第 27 條</a>一直就是這個處理）。第 4、5 節兩條只是移除 TODO、補上數字，等級不動。</p>
+<h2>沒照 issue 做的地方</h2>
+<ul>
+<li>翻譯本身不合入本倉庫（CLAUDE.md 規則），這次只處理對中文原文的來源建議。</li>
+<li>issue 提議可以直接開 PR。本輪已經在本地改完，不需要 PR。</li>
+</ul>
