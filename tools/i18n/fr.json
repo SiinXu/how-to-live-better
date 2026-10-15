@@ -191,7 +191,7 @@
 "sec正文": "Contenu",
 "sec许可": "Licence",
 "aSiteH": "À propos de ce site",
-"aSite1": "Ce site est une mise en page de lecture de 高性价比人生指南 (How to Live Better), réalisée par SiinXu ; ce n'est pas le site officiel de l'auteur. Conseils, dossiers et vérifications sont repris mot pour mot de {repo} ; seuls la mise en page, la navigation, les renvois et les filtres ont été ajoutés. Les niveaux de rentabilité suivent la même règle publique que la page de recherche d'origine.",
+"aSite1": "Ce site est une mise en page de lecture de 高性价比人生指南 (How to Live Better), réalisée par Incidental AI ; ce n'est pas le site officiel de l'auteur. Conseils, dossiers et vérifications sont repris mot pour mot de {repo} ; seuls la mise en page, la navigation, les renvois et les filtres ont été ajoutés. Les niveaux de rentabilité suivent la même règle publique que la page de recherche d'origine.",
 "aSite2": "Synchronisé avec le commit {commit} ({date}). Lois, aides et délais changent souvent ; la dernière version d'origine fait foi. Une erreur ? {issue}.",
 "aIssue": "Ouvrez une issue auprès de l'auteur",
 "aSite3": "Licence du contenu : {lic}. L'auteur accepte aussi les dons WeChat, voir le {readme}.",
