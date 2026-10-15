@@ -324,7 +324,7 @@ function chapter(n, focus, same) {
     const prev = CH[n - 1], next = CH[n + 1];
     render(`<div class="wrap cpage">
       <aside class="side" id="cside">
-        <div class="group"><div class="gt">${t('lnGroup')}</div><div class="seg col" id="side-ln">${LENS_ORDER.map(k => `<button class="chip" data-ln="${k}" aria-pressed="false"${c.e.some(e => e.ln === k) ? '' : ' disabled'}><span class="ic">${ICON[k]}</span>${LENS[k]}<span class="n">${c.e.filter(e => e.ln === k).length}</span></button>`).join('')}</div></div>
+        <div class="group"><div class="gt">${t('lnGroup')}</div><div class="seg col" id="side-ln">${LENS_ORDER.map(k => `<button class="chip" data-ln="${k}" aria-pressed="false"${c.e.some(e => e.ln === k) ? '' : ' disabled hidden'}><span class="ic">${ICON[k]}</span>${LENS[k]}<span class="n">${c.e.filter(e => e.ln === k).length}</span></button>`).join('')}</div></div>
         <div class="group grow"><div class="gt">${t('chapters')}<small>${esc(t('nCh', { n: D.ch.length }))}</small></div><nav class="snav">${sideLinks}</nav></div>
       </aside>
       <div class="cmain">
@@ -424,7 +424,8 @@ function sDraw(append) {
   const list = ALL.filter(e => sMatch(e));
   $$('.fpanel [data-k]').forEach(b => {
     const k = b.dataset.k; b.classList.toggle('on', s[k].has(b.dataset.v));
-    b.querySelector('[data-c]').textContent = ' ' + ALL.filter(e => String(e[k]) === b.dataset.v && sMatch(e, k)).length;
+    const nn = ALL.filter(e => String(e[k]) === b.dataset.v && sMatch(e, k)).length;
+    b.querySelector('[data-c]').textContent = ' ' + nn; b.hidden = nn === 0 && !s[k].has(b.dataset.v);
   });
   $('#sdp').classList.toggle('on', s.dp);
   const any = s.q || s.ch || s.dp || SF.some(([k]) => s[k].size);

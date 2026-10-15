@@ -472,3 +472,18 @@ html:not([lang^="zh"]) .human,html:not([lang^="zh"]) .cg .v{word-break:normal;ov
   .top a.icon[href*="github.com"]{display:none}
   .lang-v svg.cv{display:none}.lang-b{padding:0 6px}
 }
+
+/* review fixes 2026-10-15: natural-height cost/gain cards, ~68ch measure, hide empty filters, 32px+ tap targets */
+.cg{align-items:start}
+.entry>.human,.entry>.note{max-width:68ch}
+.entry>.cg{max-width:calc(68ch + 34px)}
+.entry .src .body{max-width:72ch}
+.chip[hidden],.fpanel [hidden]{display:none!important}
+@media (max-width:760px){
+  .chip{height:auto;min-height:34px}
+  .meta-row .tg,.meta-row .rate,.meta-row .gd{min-height:26px;display:inline-flex;align-items:center}
+  .meta-row a.tg,.crumbs a,.cp,.ops .chip,.fpanel button{min-height:34px;min-width:34px;display:inline-flex;align-items:center}
+  .entry>.cg{max-width:none}
+  .src-a,.xr,.flinks a,.srcline a{display:inline-block;padding:6px 0}
+  .mini{height:40px}
+}
