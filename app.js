@@ -11,7 +11,8 @@ const I = window.HTLB_I18N, LANG = window.HTLB_LANG || 'zh-CN';
 const STR = I.str[LANG] || I.str['zh-CN'];
 const t = (k, v) => { let s = STR[k]; if (s == null || s === '') s = (I.str.en[k] || I.str['zh-CN'][k] || k); return v ? s.replace(/\{(\w+)\}/g, (_, x) => v[x] != null ? v[x] : '') : s; };
 const IS_ZH = LANG === 'zh-CN' || LANG === 'zh-TW';
-const CONTENT = { 'zh-TW': 1, en: 1, es: 1 }[LANG] ? LANG : '';
+/* non-Chinese locales without their own content translation read the English overlay (never the Chinese original) */
+const CONTENT = { 'zh-TW': 1, en: 1, es: 1 }[LANG] ? LANG : (IS_ZH ? '' : 'en');
 const LOCALE = { 'zh-CN': 'zh-CN', 'zh-TW': 'zh-TW' }[LANG] || LANG;
 const chT = c => (I.titles[LANG] && I.titles[LANG][c.n]) || c.t;
 const LABEL = { m:{'0':t('m0'),'少':t('m少'),'多':t('m多')}, ti:{'少':t('ti少'),'中':t('ti中'),'多':t('ti多')}, w:{'否':t('w否'),'些':t('w些'),'是':t('w是')} };
@@ -96,7 +97,7 @@ document.addEventListener('click', e => {
 });
 
 /* ---------- data ---------- */
-const ovP = CONTENT ? fetch('data/i18n-' + CONTENT + '.json?v=9').then(r => r.json()).catch(() => null) : Promise.resolve(null);
+const ovP = CONTENT ? fetch('data/i18n-' + CONTENT + '.json?v=10').then(r => r.json()).catch(() => null) : Promise.resolve(null);
 Promise.all([fetch('data/book.json').then(r => r.json()), ovP]).then(([d, ov]) => {
   D = d; OV = ov;
   if (ov) applyOverlay(d, ov);
@@ -120,6 +121,7 @@ function applyOverlay(d, ov) {
       const oe = ov.e && ov.e[c.n + '-' + e.n]; if (!oe) continue;
       e.zh = {}; e.tr = 0;
       for (const k of ['t', 'human', 'cost', 'gain', 'note']) if (oe[k]) { e.zh[k] = e[k]; e[k] = oe[k]; e.tr++; }
+      if (oe.src) e.src = oe.src;
     }
   }
   if (ov.q) Object.assign(d.q, ov.q);
@@ -213,7 +215,7 @@ function entryHTML(e, o = {}) {
     <div class="meta-row">
       ${o.showCh ? `<a class="tg chl" href="#/c/${e.c}">${esc(t('chNT', { n: e.c, t: chT(CH[e.c]) }))}</a>` : ''}
       <span class="rate ${rc}" title="${esc(t('rateTitle'))}">${esc(t('rate', { r: RATE(e.r) }))}</span>
-      <span class="gd g${e.g}" title="${esc(t('evTitle', { g: e.gfull || e.g }))}"><i></i>${esc(t('ev', { g: e.g }))}</span>
+      <span class="gd g${e.g}" title="${esc(t('evTitle', { g: gf(e) }))}"><i></i>${esc(t('ev', { g: e.g }))}</span>
       <span class="tg ln">${LENS[e.ln] || e.ln}</span>
       ${cost}
       ${e.dp ? `<span class="tg warn">${t('dispute')}</span>` : ''}${e.todo ? `<span class="tg warn">${t('todo')}</span>` : ''}
@@ -224,12 +226,13 @@ function entryHTML(e, o = {}) {
       <div class="col"><div class="k">${t('gain')}<span>${t('gainSub')}</span></div><div class="v">${hl(e.gain, tt)}</div></div>
     </div>
     ${o.compact ? '' : `${e.note ? `<div class="note"><span class="k">${t('note')}</span><div>${hl(e.note, tt)}</div></div>` : ''}
-    <details class="src"${o.open ? ' open' : ''}><summary><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>${t('sources')}<span class="cnt">${esc(t('ev', { g: e.gfull || e.g }))}</span></summary><div class="body">${formatSrc(e.src)}</div></details>`}
+    <details class="src"${o.open ? ' open' : ''}><summary><svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>${t('sources')}<span class="cnt">${esc(t('ev', { g: gf(e) }))}</span></summary><div class="body">${formatSrc(e.src)}</div></details>`}
   </article>`;
 }
 
 /* ---------- home ---------- */
-const SOURCES = [['国务院', '国务院'], ['最高人民法院', '最高人民法院'], ['JAMA', 'JAMA'], ['国家卫生健康委', '国家卫健委'], ['Cochrane', 'Cochrane'], ['Lancet', 'The Lancet'], ['公安部', '公安部'], ['New England Journal of Medicine', 'NEJM'], ['BMJ', 'BMJ']];
+const SOURCES = IS_ZH ? [['国务院', '国务院'], ['最高人民法院', '最高人民法院'], ['JAMA', 'JAMA'], ['国家卫生健康委', '国家卫健委'], ['Cochrane', 'Cochrane'], ['Lancet', 'The Lancet'], ['公安部', '公安部'], ['New England Journal of Medicine', 'NEJM'], ['BMJ', 'BMJ']]
+  : [['State Council', 'State Council'], ["Supreme People's Court", "Supreme People's Court"], ['JAMA', 'JAMA'], ['National Health Commission', 'NHC'], ['Cochrane', 'Cochrane'], ['Lancet', 'The Lancet'], ['Ministry of Public Security', 'Public Security'], ['New England Journal of Medicine', 'NEJM'], ['BMJ', 'BMJ']];
 function home() {
   const m = D.meta, s = m.stats;
   const pick = (c, n) => CH[c] && CH[c].e.find(e => e.n === n);
@@ -250,7 +253,7 @@ function home() {
     </div>`;
   }).join('');
   const chs = D.ch.map(c => `<a class="cell" href="#/c/${c.n}"><span class="cn">${pad(c.n)}</span><b>${esc(chT(c))}</b>${IS_ZH || LANG === 'en' ? `<small>${esc(D.q[c.n] || '')}</small>` : ''}<span class="cf">${evBar(c)}<span class="cc">${esc(t('cellCount', { n: c.e.length, a: c.cnt.A }))}</span><span class="ca">${ARROW}</span></span></a>`).join('');
-  const longs = D.docs.filter(d => d.kind === 'doc').map(docRow).join('');
+  const longs = IS_ZH ? D.docs.filter(d => d.kind === 'doc').map(docRow).join('') : zhOnly();
   const sugg = (IS_ZH || LANG === 'en' ? [2, 5, 7, 13] : []).filter(n => D.q[n]).map(n => `<li><a href="#/c/${n}"><span>↳</span><em>${esc(D.q[n])}</em></a></li>`).join('');
   const lede = m.lede[0].split('。').filter(Boolean);
   render(`
@@ -308,6 +311,9 @@ function home() {
   $$('.wtabs button').forEach(b => b.onclick = () => show(+b.dataset.i));
   show(0);
 }
+/* long reads and verification records exist only in Chinese: non-Chinese pages point to the Chinese version instead of showing it */
+function gf(e) { if (IS_ZH || !e.gfull || !/[\u4e00-\u9fff]/.test(e.gfull)) return e.gfull || e.g; return /争议/.test(e.gfull) ? `${e.g} (${t('dispute')})` : e.g; }
+function zhOnly() { return `<div class="lnote"><p>${esc(t('cPageZh'))} <a href="#" data-setlang="zh-CN">${esc(I.str['zh-CN'].langName)}</a></p></div>`; }
 function docRow(d) {
   const mins = Math.max(1, Math.round(d.chars / 500));
   return `<a class="drow spot rv" href="#/${d.kind === 'rec' ? 'rec' : 'doc'}/${d.id}"><b>${esc(d.title)}</b><small>${esc(d.lead)}</small><span class="dm">${esc(t('mins', { n: mins }))}</span></a>`;
@@ -345,7 +351,7 @@ function chapter(n, focus, same) {
         </div>
         <div class="elist" id="elist"></div>
         <nav class="pager">${prev ? `<a class="pg" href="#/c/${prev.n}"><small>${esc(t('prev', { n: pad(prev.n) }))}</small><b>${esc(chT(prev))}</b></a>` : '<span></span>'}${next ? `<a class="pg nx" href="#/c/${next.n}"><small>${esc(t('next', { n: pad(next.n) }))}</small><b>${esc(chT(next))}</b></a>` : ''}</nav>
-        <p class="srcline">${t('origFile')}<a href="${GH}/blob/main/book/${encodeURIComponent(c.file)}" target="_blank" rel="noopener">book/${esc(c.file)}</a> · ${t('byAuthor')} · CC BY 4.0</p>
+        <p class="srcline">${t('origFile')}<a href="${GH}/blob/main/book/${encodeURIComponent(c.file)}" target="_blank" rel="noopener">${IS_ZH ? 'book/' + esc(c.file) : 'HowToLiveBetter · ' + esc(String(c.file).split('-')[0])}</a> · ${t('byAuthor')} · CC BY 4.0</p>
       </div></div>`, 'c', chT(c));
     $('#chsel').onchange = e => location.hash = '#/c/' + e.target.value;
     $('#cq').oninput = e => { cf.q = e.target.value.trim().toLowerCase(); drawEntries(c); };
@@ -450,8 +456,8 @@ function docs() {
     <p class="lede" style="animation:none">${t('dLede', { link: `<a href="#/rec" style="text-decoration:underline">${t('rec')}</a>` })}</p>
     ${IS_ZH && LANG === 'zh-CN' ? '' : `<div class="lnote">${langNote(true)}</div>`}
   </section>
-  <section class="wrap sec"><div class="dlist">${longs.map(docRow).join('')}</div></section>
-  <section class="wrap sec"><header class="sh"><h2>${t('more')}</h2><span>${t('moreSub')}</span></header><div class="dlist">${extra.map(d => `<a class="drow" href="#/about/${d.id}"><b>${esc(d.title)}</b><small>${esc(d.lead)}</small><span class="dm">${d.id === 'skill' ? t('aiSkill') : t('readerWork')}</span></a>`).join('')}<a class="drow" href="#/rec"><b>${t('recRowT')}</b><small>${t('recRowL')}</small><span class="dm">${esc(t('nDocs', { n: D.docs.filter(d => d.kind === 'rec').length }))}</span></a></div></section>`, 'docs', t('docs'));
+  <section class="wrap sec"><div class="dlist">${IS_ZH ? longs.map(docRow).join('') : zhOnly()}</div></section>
+  <section class="wrap sec"><header class="sh"><h2>${t('more')}</h2><span>${t('moreSub')}</span></header><div class="dlist">${extra.map(d => `<a class="drow" href="#/about/${d.id}"><b>${esc(IS_ZH ? d.title : t(d.id === 'skill' ? 'aSkill' : 'aDerived'))}</b><small>${IS_ZH ? esc(d.lead) : ''}</small><span class="dm">${d.id === 'skill' ? t('aiSkill') : t('readerWork')}</span></a>`).join('')}<a class="drow" href="#/rec"><b>${t('recRowT')}</b><small>${t('recRowL')}</small><span class="dm">${esc(t('nDocs', { n: D.docs.filter(d => d.kind === 'rec').length }))}</span></a></div></section>`, 'docs', t('docs'));
 }
 function recs() {
   const rs = D.docs.filter(d => d.kind === 'rec');
@@ -466,7 +472,7 @@ function recs() {
     <p class="lede" style="animation:none">${t('rLede')}</p>
     <form class="hsearch" id="rf">${SEARCH}<input id="rq" type="search" placeholder="${esc(t('rPh'))}" autocomplete="off"></form>
   </section>
-  <section class="wrap" id="rwrap">${html.map(([n, l]) => `<div class="rgroup"><h3>${n} · ${l.length}</h3><div class="rlist">${sorted(l).map(r => `<a class="rl" href="#/rec/${r.id}" data-t="${esc(r.title + ' ' + r.stem)}"><b>${esc(r.title)}</b><small>${(r.chars / 1000).toFixed(1)}k</small></a>`).join('')}</div></div>`).join('')}</section>`, 'rec', t('rec'));
+  <section class="wrap" id="rwrap">${!IS_ZH ? zhOnly() : html.map(([n, l]) => `<div class="rgroup"><h3>${n} · ${l.length}</h3><div class="rlist">${sorted(l).map(r => `<a class="rl" href="#/rec/${r.id}" data-t="${esc(r.title + ' ' + r.stem)}"><b>${esc(r.title)}</b><small>${(r.chars / 1000).toFixed(1)}k</small></a>`).join('')}</div></div>`).join('')}</section>`, 'rec', t('rec'));
   $('#rf').onsubmit = e => e.preventDefault();
   $('#rq').oninput = e => {
     const t = e.target.value.trim().toLowerCase().replace(/\s+/g, '');
@@ -480,15 +486,16 @@ async function loadDoc(id) {
 }
 async function doc(id, kind, back) {
   const d = D.docs.find(x => x.id === id); if (!d) return docs();
-  render('<div class="wrap loading"><div class="spin"></div></div>', kind === 'rec' ? 'rec' : (back ? 'about' : 'docs'), d.title);
-  let h; try { h = await loadDoc(id); } catch (e) { app.innerHTML = '<div class="wrap empty">' + esc(t('docFail')) + '</div>'; return; }
+  const dTitle = IS_ZH ? d.title : (kind === 'rec' ? t('rec') : kind === 'extra' ? t(id === 'skill' ? 'aSkill' : 'aDerived') : t('docs'));
+  render('<div class="wrap loading"><div class="spin"></div></div>', kind === 'rec' ? 'rec' : (back ? 'about' : 'docs'), dTitle);
+  let h; try { h = IS_ZH ? await loadDoc(id) : ''; } catch (e) { app.innerHTML = '<div class="wrap empty">' + esc(t('docFail')) + '</div>'; return; }
   const crumb = kind === 'rec' ? `<a href="#/rec">${t('rec')}</a>` : back ? `<a href="#/about">${t('about')}</a>` : `<a href="#/docs">${t('docs')}</a>`;
   render(`<div class="wrap dpage fade">
-    <article><div class="crumb">${crumb}<span>/</span><span>${esc(d.path)}</span></div>
-      ${IS_ZH && LANG === 'zh-CN' ? '' : `<div class="lnote">${langNote(true)}</div>`}<div class="prose" id="prose">${h}</div>
+    <article><div class="crumb">${crumb}${IS_ZH ? `<span>/</span><span>${esc(d.path)}</span>` : ''}</div>
+      ${IS_ZH ? (LANG === 'zh-CN' ? '' : `<div class="lnote">${langNote(true)}</div>`) : zhOnly()}<div class="prose" id="prose">${h}</div>
       <div class="dmeta"><a class="btn ghost" href="${GH}/blob/main/${d.path.split('/').map(encodeURIComponent).join('/')}" target="_blank" rel="noopener">${t('viewGH')}</a><a class="btn ghost" href="${kind === 'rec' ? '#/rec' : back ? '#/about' : '#/docs'}">${t('back')}</a></div>
     </article>
-    <aside class="dtoc" id="dtoc"></aside></div>`, kind === 'rec' ? 'rec' : (back ? 'about' : 'docs'), d.title);
+    <aside class="dtoc" id="dtoc"></aside></div>`, kind === 'rec' ? 'rec' : (back ? 'about' : 'docs'), dTitle);
   buildToc();
 }
 function buildToc() {
@@ -538,7 +545,7 @@ function about(sub) {
       <div class="alist">${m.langs.filter(([x]) => !/^(仓库|dlgrv|parveen0029|chuanman2707)$/.test(x)).map(([x, u]) => `<a class="btn ghost" href="${esc(u)}" target="_blank" rel="noopener">${esc(x)} ↗</a>`).join('')}</div>
       <p>${t('aAi', { skill: `<a href="#/about/skill">${t('aSkill')}</a>`, derived: `<a href="#/about/derived">${t('aDerived')}</a>` })}</p>
       ${IS_ZH ? `<p>${esc(m.lede[0])}</p><p>${esc(m.lede[1])}</p>${m.notes.map(n => `<blockquote><p>${n}</p></blockquote>`).join('')}` : `<p><em>${t('cAboutNote')}</em></p>`}
-      ${['怎么读', '四种资源', '证据分级', '性价比档', '正文', '许可'].map(sec).join('')}
+      ${['怎么读', '四种资源', '证据分级', '性价比档', '正文', '许可'].filter(k => IS_ZH || (OV && OV.rd && OV.rd[k])).map(sec).join('')}
     </div></article><aside class="dtoc" id="dtoc"></aside></div>`, 'about', t('about'));
   buildToc();
 }

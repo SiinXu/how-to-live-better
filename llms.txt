@@ -1,45 +1,45 @@
-# How to Live Better (高性价比人生指南) — reading site
+# How to Live Better — reading site
 > A re-typeset reading site for the open-source Chinese book “How to Live Better” (eternity4719/HowToLiveBetter): 677 pieces of advice in 34 chapters, each stating what it costs, what you gain and how strong the evidence is (441 grade A, 189 grade B, 47 grade C). For anyone who wants to spend time and money where the payoff is reliable.
 
 - Site: https://siinxu.github.io/how-to-live-better/
 - Source book: https://github.com/eternity4719/HowToLiveBetter
 - English translation source: https://github.com/dlgrv/HowToLiveBetter/tree/main/book/en
-- Languages: zh-CN (default), zh-TW, en, ja, ko, ms, vi, fr, es, de (append ?lang=<code>)
+- Languages: en (default), zh-CN, zh-TW, ja, ko, ms, vi, fr, es, de (append ?lang=<code>)
 - Reading site by Incidental AI (https://incidental.site/)
 - Full text: https://siinxu.github.io/how-to-live-better/llms-full.txt
 
 ## Chapters
-- 1. 不要早死 — How to avoid premature death
-- 2. 不要慢慢死 — Avoid a slow death
-- 3. 不要浪费精力 — Don’t waste energy
-- 4. 不要浪费时间 — Don’t waste time
-- 5. 不要浪费钱 — Don’t waste money
-- 6. 反面清单 — Things to avoid
-- 7. 没钱的时候怎么活 — How to get by when you have no money
-- 8. 别把自己搭进去：法律与财产安全 — Protect yourself: laws and personal safety
-- 9. 普通人容易踩的法律红线 — Common legal pitfalls for ordinary people
-- 10. 恋爱和结婚划不划算 — Is dating and marriage worth it?
-- 11. 程序员和技术人容易踩的红线 — Common legal pitfalls for programmers and tech professionals
-- 12. 创业与做生意：别把家底赔进去 — Starting a business: don't bet the family savings
-- 13. 紧急情况：先做什么 — Emergency situations: what to do first
-- 14. 账号与信息安全 — Account and Information Security
-- 15. 租房与买房 — Renting and buying a home
-- 16. 得了慢性病之后怎么活 — How to live after a chronic disease diagnosis
-- 17. 家里有老人 — Elderly at home
-- 18. 养孩子划不划算 — Is raising a child worth it?
-- 19. 在职、离职和工伤 — Employment, resignation, and work injury
-- 20. 刚出生的孩子怎么带 — How to care for a newborn
-- 21. 出国、旅行与境外安全 — Traveling abroad, trips, and safety overseas
-- 22. 怎么放松：娱乐场所和减压 — How to relax: entertainment venues and stress relief
-- 23. 学什么技能划算 — Which skills are worth learning?
-- 24. 看病：怎么少花钱少走弯路 — Seeking medical care: How to save money and avoid unnecessary hassle
-- 25. 人走了以后要办什么 — What to do after a loved one passes away
-- 26. 做一个网站或平台：资质、备案和服务器 — Building a website or platform: licensing, registration, and servers
-- 27. 怀孕和生产：从发现怀孕到出院办证 — Pregnancy and childbirth: From confirming pregnancy to discharge and paperwork
-- 28. 别为了外形把身体搞坏 — Don’t harm your body just to change its appearance
-- 29. 遭遇重大打击之后 — After experiencing a major setback
-- 30. 上学以后的孩子 — Children after starting school
-- 31. 十八岁之后有哪几条路 — What options are available after turning 18?
-- 32. 出国留学：身份、打工、保险和回国认证 — Studying abroad: visa status, work limits, insurance, and degree recognition
-- 33. 残疾之后怎么活 — Living after becoming disabled
-- 34. 家里的常备药别吃出事 — Avoid serious harm from over-the-counter medicines at home
+- 1. How to avoid premature death
+- 2. Avoid a slow death
+- 3. Don’t waste energy
+- 4. Don’t waste time
+- 5. Don’t waste money
+- 6. Things to avoid
+- 7. How to get by when you have no money
+- 8. Protect yourself: laws and personal safety
+- 9. Common legal pitfalls for ordinary people
+- 10. Is dating and marriage worth it?
+- 11. Common legal pitfalls for programmers and tech professionals
+- 12. Starting a business: don't bet the family savings
+- 13. Emergency situations: what to do first
+- 14. Account and Information Security
+- 15. Renting and buying a home
+- 16. How to live after a chronic disease diagnosis
+- 17. Elderly at home
+- 18. Is raising a child worth it?
+- 19. Employment, resignation, and work injury
+- 20. How to care for a newborn
+- 21. Traveling abroad, trips, and safety overseas
+- 22. How to relax: entertainment venues and stress relief
+- 23. Which skills are worth learning?
+- 24. Seeking medical care: How to save money and avoid unnecessary hassle
+- 25. What to do after a loved one passes away
+- 26. Building a website or platform: licensing, registration, and servers
+- 27. Pregnancy and childbirth: From confirming pregnancy to discharge and paperwork
+- 28. Don’t harm your body just to change its appearance
+- 29. After experiencing a major setback
+- 30. Children after starting school
+- 31. What options are available after turning 18?
+- 32. Studying abroad: visa status, work limits, insurance, and degree recognition
+- 33. Living after becoming disabled
+- 34. Avoid serious harm from over-the-counter medicines at home

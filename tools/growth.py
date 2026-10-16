@@ -17,17 +17,18 @@ INTRO = {
 txt = lambda s: html.unescape(re.sub(r'\s+', ' ', re.sub(r'<[^>]+>', ' ', s or ''))).strip()
 chs = [(c['n'], c['t'], (en['ch'].get(str(c['n'])) or {}).get('t', ''), txt((en['ch'].get(str(c['n'])) or {}).get('intro', ''))) for c in b['ch']]
 e = html.escape
-ssr = ('<!--IA--><section class="wrap ssr-index" style="padding:24px 0 8px"><h1>高性价比人生指南 · How to Live Better</h1>'
-       f'<p>{e(INTRO["zh-CN"])}</p><p lang="en">{e(INTRO["en"])}</p><h2>目录 · Chapters</h2><ol>'
-       + ''.join(f'<li><a href="#/c/{n}">{e(t)}</a>{" · " + e(te) if te else ""}</li>' for n, t, te, _ in chs) + '</ol></section><!--/IA-->')
+# default HTML is English (served to every locale before JS picks the language); Chinese lives in JS / ?lang=zh-CN
+ssr = ('<!--IA--><section class="wrap ssr-index" style="padding:24px 0 8px"><h1>How to Live Better</h1>'
+       f'<p>{e(INTRO["en"])}</p><h2>Chapters</h2><ol>'
+       + ''.join(f'<li><a href="#/c/{n}">{e(te or str(n))}</a></li>' for n, t, te, _ in chs) + '</ol></section><!--/IA-->')
 cfg = {'root': R, 'base': BASE, 'name': 'How to Live Better', 'site': 'htlb', 'cf_token': '41d8abdb6f1247c08f2412afcd5f2143', 'goal': 'scroll_75', 'og_image': 'og.png', 'hreflang': True,
-       'subcss_path': os.path.join(D, 'subscribe.css'), 'intro': INTRO, 'intro_after': '</header>', 'intro_fallback': 'zh-CN',
+       'subcss_path': os.path.join(D, 'subscribe.css'), 'intro': INTRO, 'intro_after': '</header>', 'intro_fallback': 'en', 'desc': INTRO['en'],
        'intro_css': 'max-width:1080px;margin:14px auto 0;padding:0 20px;font-size:12.5px;line-height:1.55;opacity:.72',
        'sub_before': '<footer', 'sub_css': 'max-width:760px;margin:32px auto;padding:0 20px;--ie-acc:var(--inv);--ie-acc-ink:var(--inv-fg)',
-       'pages': [{'file': 'index.html', 'rel': '', 'ld': [{'@type': 'Book', 'name': '高性价比人生指南 (How to Live Better)', 'url': 'https://github.com/eternity4719/HowToLiveBetter', 'inLanguage': 'zh-CN', 'numberOfPages': None and 0},
-                                                        {'@type': 'WebPage', 'name': 'How to Live Better — reading site', 'url': BASE, 'about': {'@type': 'Book', 'name': '高性价比人生指南'}, 'isBasedOn': 'https://github.com/eternity4719/HowToLiveBetter', 'publisher': {'@id': 'https://incidental.site/#org'}}]}]}
+       'pages': [{'file': 'index.html', 'rel': '', 'ld': [{'@type': 'Book', 'name': 'How to Live Better', 'url': 'https://github.com/eternity4719/HowToLiveBetter', 'inLanguage': 'zh-CN', 'numberOfPages': None and 0},
+                                                        {'@type': 'WebPage', 'name': 'How to Live Better — reading site', 'url': BASE, 'about': {'@type': 'Book', 'name': 'How to Live Better'}, 'isBasedOn': 'https://github.com/eternity4719/HowToLiveBetter', 'publisher': {'@id': 'https://incidental.site/#org'}}]}]}
 cfg['pages'][0]['ld'][0].pop('numberOfPages')
-llms = f'# How to Live Better (高性价比人生指南) — reading site\n> {INTRO["en"]}\n\n- Site: {BASE}\n- Source book: https://github.com/eternity4719/HowToLiveBetter\n- English translation source: {en["src"]["url"]}\n- Languages: zh-CN (default), zh-TW, en, ja, ko, ms, vi, fr, es, de (append ?lang=<code>)\n- Reading site by Incidental AI (https://incidental.site/)\n- Full text: {BASE}llms-full.txt\n\n## Chapters\n' + ''.join(f'- {n}. {t}{" — " + te if te else ""}\n' for n, t, te, _ in chs)
+llms = f'# How to Live Better — reading site\n> {INTRO["en"]}\n\n- Site: {BASE}\n- Source book: https://github.com/eternity4719/HowToLiveBetter\n- English translation source: {en["src"]["url"]}\n- Languages: en (default), zh-CN, zh-TW, ja, ko, ms, vi, fr, es, de (append ?lang=<code>)\n- Reading site by Incidental AI (https://incidental.site/)\n- Full text: {BASE}llms-full.txt\n\n## Chapters\n' + ''.join(f'- {n}. {te or "Chapter " + str(n)}\n' for n, t, te, _ in chs)
 cfg['llms.txt'] = llms
 cfg['llms-full.txt'] = llms + '\n' + ''.join(f'\n## {n}. {te or t}\n{it}\n' for n, t, te, it in chs if it)
 p = '/tmp/htlb-ia.json'; json.dump(cfg, open(p, 'w'), ensure_ascii=False)
