@@ -283,8 +283,7 @@ kbd{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 
 .gd i{width:6px;height:6px;border-radius:50%;background:var(--c)}
 .gd.gA{color:var(--a);background:var(--a-bg);box-shadow:none;font-weight:500}.gd.gA i{background:var(--a)}
 .gd.gB{color:var(--b);background:var(--b-bg);box-shadow:none;font-weight:500}.gd.gB i{background:var(--b)}
-.human{position:relative;margin:16px 0 0 34px;padding:13px 16px 13px 18px;border-radius:12px;background:var(--surface);box-shadow:0 0 0 1px var(--line),var(--sh-1);font-size:15px;line-height:1.75;color:var(--fg);text-wrap:pretty}
-.human::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:2px;border-radius:2px;background:linear-gradient(var(--a),var(--b))}
+.human{position:relative;margin:16px 0 0 34px;padding:13px 16px;border-radius:12px;background:var(--surface);box-shadow:0 0 0 1px var(--line),var(--sh-1);font-size:15px;line-height:1.75;color:var(--fg);text-wrap:pretty}
 .human .lb{display:inline-block;margin-right:10px;font-size:12px;font-weight:600;color:var(--fg-3)}
 .cg{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0 0 34px;padding:6px;border-radius:14px;background:var(--tray);box-shadow:inset 0 0 0 1px var(--line)}
 .col{padding:12px 14px;border-radius:9px;background:var(--surface);box-shadow:0 0 0 1px var(--line);min-width:0}
@@ -382,8 +381,11 @@ body:has(.cpage,.dpage) .rails::before,body:has(.cpage,.dpage) .rails::after{dis
 .dmeta{display:flex;gap:8px;margin-top:40px;flex-wrap:wrap}
 .dtoc{position:sticky;top:calc(var(--hh) + 24px);align-self:start;max-height:calc(100vh - var(--hh) - 48px);overflow:auto;font-size:13px}
 .dtoc .lab{font-weight:500;color:var(--fg-3);margin:0 0 10px}
+/* allow-left-border: toc rail (nav) */
 .dtoc a{display:block;padding:4px 0 4px 12px;border-left:1px solid var(--line);color:var(--fg-3);line-height:1.5;transition:color .15s,border-color .15s}
+/* allow-left-border: toc rail (nav) */
 .dtoc a.h3{padding-left:24px}
+/* allow-left-border: toc rail (nav) */
 .dtoc a:hover{color:var(--fg)}.dtoc a.on{color:var(--fg);border-left-color:var(--fg)}
 .loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:120px 0;color:var(--fg-3);font-size:13.5px}
 .spin{width:22px;height:22px;border-radius:50%;border:2px solid var(--line-2);border-top-color:var(--fg);animation:spin .8s linear infinite}
